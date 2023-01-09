@@ -24,9 +24,14 @@ class _OurSignUpFormState extends State<OurSignUpForm> {
     CurrenState currenState = Provider.of<CurrenState>(context,listen: false);
 
     try{
-      if(await currenState.signUpUser(email, password)){
+      String returnString=await currenState.signUpUser(email, password);
+      if(returnString=="success"){
         Navigator.pop(context);
-    }
+      }else{
+        Scaffold.of(context).showSnackBar(
+            SnackBar(content: Text(returnString),
+              duration: Duration(seconds: 2),));
+      }
     }catch(e){
       print(e);
     }

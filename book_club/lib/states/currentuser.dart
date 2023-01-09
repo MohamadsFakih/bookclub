@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 
 class CurrenState extends ChangeNotifier{
@@ -12,22 +13,21 @@ class CurrenState extends ChangeNotifier{
 
   FirebaseAuth auth =FirebaseAuth.instance;
 
-  Future<bool> signUpUser(String email,String password)async{
-   bool retval=false;
+  Future<String> signUpUser(String email,String password)async{
+   String retval="error";
 
    try{
-     UserCredential authResult=await auth.createUserWithEmailAndPassword(email: email, password: password);
-     if(authResult.user!=null){
-       retval=true;
-     }
+      await auth.createUserWithEmailAndPassword(email: email, password: password);
+      retval="success";
+
    }catch(e){
-     print(e);
+     retval=e.toString();
    }
 
    return retval;
   }
-  Future<bool> loginUser(String email,String password)async{
-    bool retval=false;
+  Future<String> loginUser(String email,String password)async{
+    String retval="error";
 
     try{
       UserCredential authResult=await auth.signInWithEmailAndPassword(email: email, password: password);
@@ -36,12 +36,43 @@ class CurrenState extends ChangeNotifier{
         uid=user.uid;
         email=user.email!;
 
-        retval=true;
+        retval="success";
       }
     }catch(e){
-      print(e);
+      retval=e.toString();
     }
 
     return retval;
   }
+
+
+   Future<String> loginUserWithGoogle()async{
+     String retval="error";
+     
+     
+     GoogleSignIn googleSignIn =GoogleSignIn(
+       scopes: [
+         'email',
+         'https://www.googleapis.com/auth/contacts.readonly',
+       ]
+     );
+
+     try{
+       GoogleSignInAccount? googleUser=await googleSignIn.signIn();
+       GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+       final AuthCredential credential = GoogleAuthProvider.credential(idToken: googleAuth?.idToken,accessToken: googleAuth?.accessToken);
+       UserCredential authResult = await auth.signInWithCredential(credential) ;
+       final user = authResult.user;
+       if(user!=null){
+         uid=user.uid;
+         email=user.email!;
+
+         retval="success";
+       }
+     }catch(e){
+       retval=e.toString();
+     }
+
+     return retval;
+   }
 }
