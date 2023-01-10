@@ -13,6 +13,32 @@ class CurrenState extends ChangeNotifier{
 
   FirebaseAuth auth =FirebaseAuth.instance;
 
+  Future<String> onStartUp() async{
+    String retval="error";
+      try{
+        User firebaseUser = await auth.currentUser!;
+        uid=firebaseUser.uid;
+        email=firebaseUser.email!;
+        retval="success";
+      }catch(e){
+        print(e.toString());
+      }
+    return retval;
+  }
+
+   Future<String> signOut() async{
+     String retval="error";
+     try{
+       await auth.signOut();
+       uid="";
+       email="";
+       retval="success";
+     }catch(e){
+       print(e.toString());
+     }
+     return retval;
+   }
+
   Future<String> signUpUser(String email,String password)async{
    String retval="error";
 
