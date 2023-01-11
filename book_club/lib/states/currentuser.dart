@@ -1,15 +1,17 @@
+import 'package:book_club/models/user.dart';
+import 'package:book_club/services/database.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 
 class CurrenState extends ChangeNotifier{
-   late String uid;
-   late String email;
+  OurUser currentUser=OurUser(uid: "", email: "", fullname: "", accountCreated: Timestamp.now());
 
 
-   String get getUid => uid;
-   String get getEmail =>email;
+
+  OurUser get getCurrentUser => currentUser;
 
   FirebaseAuth auth =FirebaseAuth.instance;
 
@@ -17,9 +19,11 @@ class CurrenState extends ChangeNotifier{
     String retval="error";
       try{
         User firebaseUser = await auth.currentUser!;
-        uid=firebaseUser.uid;
-        email=firebaseUser.email!;
-        retval="success";
+        currentUser= await OurDatabase().getUserInfo(firebaseUser.uid);
+
+        if(currentUser!=null){
+          retval="success";
+        }
       }catch(e){
         print(e.toString());
       }
@@ -30,8 +34,7 @@ class CurrenState extends ChangeNotifier{
      String retval="error";
      try{
        await auth.signOut();
-       uid="";
-       email="";
+       currentUser=OurUser(uid: "", email: "", fullname: "", accountCreated: Timestamp.now() );
        retval="success";
      }catch(e){
        print(e.toString());
@@ -39,12 +42,20 @@ class CurrenState extends ChangeNotifier{
      return retval;
    }
 
-  Future<String> signUpUser(String email,String password)async{
+  Future<String> signUpUser(String email,String password,String fullname)async{
    String retval="error";
+   OurUser user=OurUser(uid: "", email: "", fullname: "", accountCreated: Timestamp.now());
 
    try{
-      await auth.createUserWithEmailAndPassword(email: email, password: password);
-      retval="success";
+      UserCredential authResult= await auth.createUserWithEmailAndPassword(email: email, password: password);
+      user.uid=(authResult.user?.uid)!;
+      user.email=(authResult.user?.email)!;
+      user.fullname=fullname;
+      String returnString=await  OurDatabase().createUser(user);
+      if(returnString=="success"){
+        retval="success";
+      }
+
 
    }catch(e){
      retval=e.toString();
@@ -59,11 +70,17 @@ class CurrenState extends ChangeNotifier{
       UserCredential authResult=await auth.signInWithEmailAndPassword(email: email, password: password);
       final user = authResult.user;
       if(user!=null){
-        uid=user.uid;
-        email=user.email!;
+        currentUser= await OurDatabase().getUserInfo((authResult.user?.uid)!);
+        print(currentUser.fullname);
 
-        retval="success";
+
+        if(currentUser!=null){
+          retval="success";
+        }
+
+
       }
+
     }catch(e){
       retval=e.toString();
     }
@@ -83,18 +100,33 @@ class CurrenState extends ChangeNotifier{
        ]
      );
 
+
+     OurUser user=OurUser(uid: "", email: "", fullname: "", accountCreated: Timestamp.now());
      try{
+
+
        GoogleSignInAccount? googleUser=await googleSignIn.signIn();
        GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
        final AuthCredential credential = GoogleAuthProvider.credential(idToken: googleAuth?.idToken,accessToken: googleAuth?.accessToken);
        UserCredential authResult = await auth.signInWithCredential(credential) ;
-       final user = authResult.user;
-       if(user!=null){
-         uid=user.uid;
-         email=user.email!;
 
+       if((authResult.additionalUserInfo?.isNewUser)!){
+
+         user.uid=(authResult.user?.uid)!;
+         user.email=(authResult.user?.email)!;
+         user.fullname=(authResult.user?.displayName)!;
+
+         OurDatabase().createUser(user);
+
+       }
+      currentUser= await OurDatabase().getUserInfo((authResult.user?.uid)!);
+
+       if(currentUser!=null){
          retval="success";
        }
+
+
+
      }catch(e){
        retval=e.toString();
      }

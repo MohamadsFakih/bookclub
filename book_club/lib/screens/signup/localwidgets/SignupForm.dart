@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 
 import '../../../widgets/ourContainer.dart';
+import '../../Home/home.dart';
 
 class OurSignUpForm extends StatefulWidget {
   const OurSignUpForm({Key? key}) : super(key: key);
@@ -20,13 +21,13 @@ class _OurSignUpFormState extends State<OurSignUpForm> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmpassController = TextEditingController();
 
-  void _signUpUser(String email,String password,BuildContext context)async{
+  void _signUpUser(String email,String password,BuildContext context,String fullName)async{
     CurrenState currenState = Provider.of<CurrenState>(context,listen: false);
 
     try{
-      String returnString=await currenState.signUpUser(email, password);
+      String returnString=await currenState.signUpUser(email, password,fullName);
       if(returnString=="success"){
-        Navigator.pop(context);
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>HomeScreen(),), (route) => false);
       }else{
         Scaffold.of(context).showSnackBar(
             SnackBar(content: Text(returnString),
@@ -84,7 +85,7 @@ class _OurSignUpFormState extends State<OurSignUpForm> {
           ),
           onPressed: (){
             if(passwordController.text==confirmpassController.text){
-              _signUpUser(emailController.text,passwordController.text,context);
+              _signUpUser(emailController.text,passwordController.text,context,fullNameController.text);
             }else{
               Scaffold.of(context).showSnackBar(
                 SnackBar(content: Text("Passwords do not match"),
