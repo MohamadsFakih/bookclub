@@ -1,0 +1,18 @@
+Book Club
+-Every person picks 1 book
+-We read that book at a certain pace of pages.
+-Google sheets that has statistics about each book including rating and page length.
+-Group chat to talk about the book.
+-A day to rate and discuss the book.
+
+Use Cases
+-Be able to create/join a group with people.
+-To give a rating of the book once done.
+-To review the book once done.
+-To pick a book for the bookclub.
+-To access statistics about previous books the book club read. Including most liked.
+-Group chat feature.
+-Show due date to finish the book.
+-Create user profile
+-Login/Signup
+
