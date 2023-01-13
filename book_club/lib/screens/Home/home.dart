@@ -1,14 +1,28 @@
 import 'package:book_club/screens/noGroup/nogroup.dart';
 import 'package:book_club/screens/root/root.dart';
+import 'package:book_club/states/currentGroup.dart';
 import 'package:book_club/states/currentuser.dart';
 import 'package:book_club/widgets/ourContainer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+
+  @override
+  void initState(){
+    super.initState();
+    CurrenState currenState=Provider.of<CurrenState>(context,listen: false);
+    CurrentGroup currentGroup=Provider.of<CurrentGroup>(context,listen: false);
+    currentGroup.updateStateFromDatabase(currenState.getCurrentUser.groupId);
+  }
 
   void goToNoGroup(BuildContext context){
     Navigator.push(context,MaterialPageRoute(builder: (context)=>OurnoGroup()));
@@ -24,34 +38,41 @@ class HomeScreen extends StatelessWidget {
           route) => false);
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     
+
       body: ListView(
         children: [
           SizedBox(height: 40,),
           Padding(
             padding: const EdgeInsets.all(20),
             child: OurContainer(
-              child: Column(
-                children: [
-                  Text("Harry Potter and the chamber of secrets",
-                  style: TextStyle(fontSize: 20,color: Colors.grey),),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    child: Row(
-                      children: [
-                        Text("Due In:",style: TextStyle(fontSize: 20,color: Colors.grey),),
-                        Text("8 Days",style: TextStyle(fontSize: 30,fontWeight: FontWeight.bold),)
-                      ],
-                    ),
-                  ),
-                  RaisedButton(
-                    onPressed: (){},
-                    child: Text("Finished Book",style: TextStyle(color: Colors.white),),
-                  )
-                ],
+              child: Consumer<CurrentGroup>(
+
+                builder: (BuildContext context, value, Widget? child) {
+                  return Column(
+                    children: [
+                      Text((value.getCurrentBook.name!= "")? value.getCurrentBook.name: "Loading...",
+                        style: TextStyle(fontSize: 20,color: Colors.grey),),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        child: Row(
+                          children: [
+                            Text("Due In:",style: TextStyle(fontSize: 20,color: Colors.grey),),
+                            Expanded(child: Text(value.getCurrentGroup.currentBookDue.toDate().toString().split('.')[0]??"Loading",style: TextStyle(fontSize: 30,fontWeight: FontWeight.bold),))
+                          ],
+                        ),
+                      ),
+                      RaisedButton(
+                        onPressed: (){},
+                        child: Text("Finished Book",style: TextStyle(color: Colors.white),),
+                      )
+                    ],
+                  );
+                },
+
               ),
             ),
           ),
@@ -75,7 +96,7 @@ class HomeScreen extends StatelessWidget {
                 style: TextStyle(color: Colors.white),),
             ),
           ),
-          
+
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40),
             child: RaisedButton(
@@ -86,7 +107,7 @@ class HomeScreen extends StatelessWidget {
               side: BorderSide(color: Theme.of(context).secondaryHeaderColor,width: 2)),
             ),
           ),
-          
+
         ],
       )
     );
