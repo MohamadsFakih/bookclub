@@ -7,7 +7,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 
 class CurrenState extends ChangeNotifier{
-  OurUser currentUser=OurUser(uid: "", email: "", fullname: "", accountCreated: Timestamp.now());
+  OurUser currentUser=OurUser(uid: "", email: "", fullname: "", accountCreated: Timestamp.now(),groupId: "");
 
 
 
@@ -34,7 +34,7 @@ class CurrenState extends ChangeNotifier{
      String retval="error";
      try{
        await auth.signOut();
-       currentUser=OurUser(uid: "", email: "", fullname: "", accountCreated: Timestamp.now() );
+       currentUser=OurUser(uid: "", email: "", fullname: "", accountCreated: Timestamp.now() ,groupId: "");
        retval="success";
      }catch(e){
        print(e.toString());
@@ -44,7 +44,7 @@ class CurrenState extends ChangeNotifier{
 
   Future<String> signUpUser(String email,String password,String fullname)async{
    String retval="error";
-   OurUser user=OurUser(uid: "", email: "", fullname: "", accountCreated: Timestamp.now());
+   OurUser user=OurUser(uid: "", email: "", fullname: "", accountCreated: Timestamp.now(),groupId: "");
 
    try{
       UserCredential authResult= await auth.createUserWithEmailAndPassword(email: email, password: password);
@@ -101,7 +101,7 @@ class CurrenState extends ChangeNotifier{
      );
 
 
-     OurUser user=OurUser(uid: "", email: "", fullname: "", accountCreated: Timestamp.now());
+     OurUser user=OurUser(uid: "", email: "", fullname: "", accountCreated: Timestamp.now(),groupId: "");
      try{
 
 

@@ -1,13 +1,18 @@
 import 'package:book_club/screens/Home/home.dart';
 import 'package:book_club/screens/login/login.dart';
+import 'package:book_club/screens/noGroup/nogroup.dart';
+import 'package:book_club/screens/splashScreen/splash.dart';
 import 'package:book_club/states/currentuser.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 enum AuthStatus{
+  unknown,
+  notInGroup,
   notLoggedIn,
-  LoggedIn
+  InGroup
+
 }
 
 class OurRoot extends StatefulWidget {
@@ -18,7 +23,7 @@ class OurRoot extends StatefulWidget {
 }
 
 class _OurRootState extends State<OurRoot> {
-  AuthStatus authStatus=AuthStatus.notLoggedIn;
+  AuthStatus authStatus=AuthStatus.unknown;
 
   @override
   void didChangeDependencies() async{
@@ -28,8 +33,20 @@ class _OurRootState extends State<OurRoot> {
     CurrenState currenState=Provider.of(context,listen: false);
     String returnString = await currenState.onStartUp();
     if(returnString=="success"){
+
+      if(currenState.getCurrentUser.groupId!=""){
+        setState((){
+          authStatus=AuthStatus.InGroup;
+        });
+
+      }else{
+        setState((){
+          authStatus=AuthStatus.notInGroup;
+        });
+      }
+    }else{
       setState((){
-        authStatus=AuthStatus.LoggedIn;
+        authStatus=AuthStatus.notLoggedIn;
       });
     }
 
@@ -40,10 +57,16 @@ class _OurRootState extends State<OurRoot> {
     Widget retval=OurLogin();
 
     switch(authStatus){
+      case AuthStatus.unknown:
+        retval=OurSplashScreen();
+        break;
       case AuthStatus.notLoggedIn:
         retval=OurLogin();
         break;
-      case AuthStatus.LoggedIn:
+      case AuthStatus.notInGroup:
+        retval=OurnoGroup();
+        break;
+      case AuthStatus.InGroup:
         retval=HomeScreen();
         break;
       default:

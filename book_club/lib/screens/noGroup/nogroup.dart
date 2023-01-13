@@ -1,3 +1,5 @@
+import 'package:book_club/screens/createGroup/creategroup.dart';
+import 'package:book_club/screens/joinGroup/joingroup.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -6,8 +8,14 @@ class OurnoGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    void goToJoin(){}
-    void goToCreate(){}
+    void goToJoin(BuildContext context){
+      Navigator.push(context,
+      MaterialPageRoute(builder: (context)=>OurJoinGroup()));
+    }
+    void goToCreate(BuildContext context){
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context)=>OurCreateGroup()));
+    }
 
     return Scaffold(
       body: Column(
@@ -34,7 +42,7 @@ class OurnoGroup extends StatelessWidget {
               children: [
                 RaisedButton(
                     onPressed: (){
-                      goToCreate();
+                      goToCreate(context);
                     },
                     child: Text("Create",),
                   color: Theme.of(context).canvasColor,
@@ -43,7 +51,7 @@ class OurnoGroup extends StatelessWidget {
                 ),
                 RaisedButton(
                   onPressed: (){
-                    goToJoin();
+                    goToJoin(context);
                   },
                   child: Text("Join",style: TextStyle(color: Colors.white),),
                 )

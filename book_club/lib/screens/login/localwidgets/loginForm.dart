@@ -1,4 +1,5 @@
 import 'package:book_club/screens/Home/home.dart';
+import 'package:book_club/screens/root/root.dart';
 import 'package:book_club/screens/signup/signup.dart';
 import 'package:book_club/states/currentuser.dart';
 import 'package:flutter/cupertino.dart';
@@ -39,7 +40,7 @@ class _OurLoginFormState extends State<OurLoginForm> {
         }
 
         if(returnString=="success"){
-          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>HomeScreen(),), (route) => false);
+          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>OurRoot(),), (route) => false);
         }else{
           Scaffold.of(context).showSnackBar(
               SnackBar(content: Text(returnString),
