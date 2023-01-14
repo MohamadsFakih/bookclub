@@ -6,7 +6,7 @@ import 'package:flutter/cupertino.dart';
 
 class CurrentGroup extends ChangeNotifier{
   OurGroup currentGroup=OurGroup(name: "", id: "", leader: "", memebrs: [], groupCreated: Timestamp.now(), currentBookDue: Timestamp.now(), currentBookId: "");
-  OurBook currentBook=OurBook(id: "", name: "", length: 0, dateCompleted: Timestamp.now());
+  OurBook currentBook=OurBook(id: "", name: "", length: "", dateCompleted: Timestamp.now(),author: "");
 
   OurGroup get getCurrentGroup =>currentGroup;
   OurBook get getCurrentBook =>currentBook;

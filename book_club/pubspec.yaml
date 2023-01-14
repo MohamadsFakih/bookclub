@@ -39,6 +39,8 @@ dependencies:
   provider:
   google_sign_in:
   cloud_firestore:
+  flutter_datetime_picker:
+  intl:
 
 
 dev_dependencies:

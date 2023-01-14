@@ -46,8 +46,30 @@ class OurDatabase{
     }
     return Future.delayed(Duration(seconds: 2), () => retVal);
   }
+  Future<String> addBook(String groupId,OurBook book)async {
+    String retval = "error";
 
-  Future<String> createGroup(String groupName,String userId)async{
+
+    try {
+      DocumentReference docRef = await firestore.collection("groups").doc(groupId).collection("books").add({
+        'name': book.name,
+        'author': book.author,
+        'length': book.length,
+        'dateCompleted': book.dateCompleted,
+      });
+      //add book to group scehdule
+      await firestore.collection("groups").doc(groupId).update({
+        'currentBook': docRef.id,
+        "currentbookDue":book.dateCompleted
+      });
+      retval = "success";
+    } catch (e) {
+      print(e);
+    }
+    return retval;
+  }
+
+  Future<String> createGroup(String groupName,String userId,OurBook initialBook)async{
     String retval="error";
     List<String> members=[];
 
@@ -62,6 +84,10 @@ class OurDatabase{
       await firestore.collection("users").doc(userId).update({
         'groupId':docRef.id
       });
+
+      //add a book
+      addBook(docRef.id,initialBook);
+
       retval="success";
 
     }catch(e){
@@ -91,6 +117,7 @@ class OurDatabase{
   }
 
 
+
   Future<OurGroup> getGroupInfo(String groupId)async{
     OurGroup retVal=OurGroup(name: "", id: "", leader: "", memebrs: [], groupCreated: Timestamp.now(), currentBookDue: Timestamp.now(), currentBookId: "");
 
@@ -101,7 +128,7 @@ class OurDatabase{
         retVal.leader=event.get("leader");
         retVal.memebrs=List<String>.from(event.get("members"));
         retVal.groupCreated=event.get("groupCreated");
-        retVal.currentBookId=event.get("currentBookId");
+        retVal.currentBookId=event.get("currentBook");
         retVal.currentBookDue=event.get("currentbookDue");
       });
     }catch(e){
@@ -112,7 +139,7 @@ class OurDatabase{
 
 
   Future<OurBook> getCurrentBook(String groupId,String bookId)async{
-    OurBook retVal=OurBook(id: "", name: "", length: 0, dateCompleted: Timestamp.now());
+    OurBook retVal=OurBook(id: "", name: "", length: "", dateCompleted: Timestamp.now(),author: "");
 
     try{
       await firestore.collection("groups").doc(groupId).collection("books").doc(bookId).snapshots().listen((event) {
@@ -120,6 +147,7 @@ class OurDatabase{
         retVal.name=event.get("name");
         retVal.length=event.get("length");
         retVal.dateCompleted=event.get("dateCompleted");
+        retVal.author=event.get("author");
       });
     }catch(e){
       print(e);

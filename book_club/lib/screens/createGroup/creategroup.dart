@@ -1,3 +1,4 @@
+import 'package:book_club/screens/addBookScreen/addBook.dart';
 import 'package:book_club/screens/root/root.dart';
 import 'package:book_club/services/database.dart';
 import 'package:book_club/states/currentuser.dart';
@@ -15,12 +16,10 @@ class OurCreateGroup extends StatefulWidget {
 
 class _OurCreateGroupState extends State<OurCreateGroup> {
 
-  void createGroup(BuildContext context,String groupName)async{
-    CurrenState currenState=Provider.of<CurrenState>(context,listen: false);
-    String returnString = await OurDatabase().createGroup(groupName, currenState.getCurrentUser.uid);
-    if(returnString=="success"){
-      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>OurRoot(),), (route) => false);
-    }
+  void goToAddBook(BuildContext context,String groupName)async{
+
+      Navigator.push(context, MaterialPageRoute(builder: (context)=> OurAddBook(groupName: groupName, onGroupCreation: true)));
+
 
   }
 
@@ -56,7 +55,7 @@ class _OurCreateGroupState extends State<OurCreateGroup> {
                           SizedBox(height: 20,),
                         RaisedButton(
                             onPressed: (){
-                              createGroup(context, groupNameController.text.trim());
+                              goToAddBook(context, groupNameController.text.trim());
                             },
                           child: Padding(
                             padding: EdgeInsets.symmetric(horizontal: 100),
