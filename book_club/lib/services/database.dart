@@ -154,4 +154,36 @@ class OurDatabase{
     }
     return Future.delayed(Duration(seconds: 2), () => retVal);
   }
+
+
+  Future<String> finishedBook(String groupId,String bookId,String uid,int rating,String review) async{
+    String retval="error";
+    try{
+      await firestore.collection("groups").doc(groupId).collection("books").doc(bookId).collection("reviews").doc(uid).set({
+        'rating':rating,
+        'review':review,
+      });
+      retval="success";
+    }catch(e){
+      print(e);
+    }
+
+    return retval;
+
+  }
+  Future<bool> isUserDoneWithBook(String groupId,String bookId,String uid)async{
+    bool retval=false;
+    try{
+      await firestore.collection("groups").doc(groupId).collection("books").doc(bookId).collection("reviews").doc(uid).snapshots().listen((event) {
+        if(event.exists){
+          retval=true;
+        }
+      });
+
+    }catch(e){
+
+    }
+
+    return retval;
+  }
 }

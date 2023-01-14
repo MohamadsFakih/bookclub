@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:book_club/screens/addBookScreen/addBook.dart';
 import 'package:book_club/screens/noGroup/nogroup.dart';
+import 'package:book_club/screens/review/review.dart';
 import 'package:book_club/screens/root/root.dart';
 import 'package:book_club/states/currentGroup.dart';
 import 'package:book_club/states/currentuser.dart';
@@ -37,7 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     CurrenState currenState=Provider.of<CurrenState>(context,listen: false);
     CurrentGroup currentGroup=Provider.of<CurrentGroup>(context,listen: false);
-    currentGroup.updateStateFromDatabase(currenState.getCurrentUser.groupId);
+    currentGroup.updateStateFromDatabase(currenState.getCurrentUser.groupId,currenState.getCurrentUser.uid);
     startTimer(currentGroup);
 
   }
@@ -50,6 +51,11 @@ class _HomeScreenState extends State<HomeScreen> {
   void goToAddBook(BuildContext context){
     CurrentGroup currentGroup=Provider.of<CurrentGroup>(context,listen: false);
     Navigator.push(context,MaterialPageRoute(builder: (context)=>OurAddBook(groupName: currentGroup.getCurrentGroup.name, onGroupCreation: false)));
+
+  }
+  void goToReview(BuildContext context){
+    CurrentGroup currentGroup=Provider.of<CurrentGroup>(context,listen: false);
+    Navigator.push(context,MaterialPageRoute(builder: (context)=>OurReview(currentGroup: currentGroup,)));
 
   }
 
@@ -90,7 +96,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       RaisedButton(
-                        onPressed: (){},
+                        onPressed: (){
+
+                          value.getDoneWithCurrentBook? null: goToReview(context);
+                        },
                         child: Text("Finished Book",style: TextStyle(color: Colors.white),),
                       )
                     ],
