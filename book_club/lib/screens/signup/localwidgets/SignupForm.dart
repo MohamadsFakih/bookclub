@@ -51,12 +51,16 @@ class _OurSignUpFormState extends State<OurSignUpForm> {
         ),
         TextFormField(
           controller: fullNameController,
+          keyboardType: TextInputType.text,
+          textInputAction: TextInputAction.next,
           decoration: InputDecoration(prefixIcon: Icon(Icons.person_outline),
               hintText: "Name"),
         ),
         SizedBox(height: 20,),
         TextFormField(
           controller: emailController,
+          keyboardType: TextInputType.emailAddress,
+          textInputAction: TextInputAction.next,
           decoration: InputDecoration(prefixIcon: Icon(Icons.alternate_email),
               hintText: "Email"),
         ),
@@ -65,6 +69,7 @@ class _OurSignUpFormState extends State<OurSignUpForm> {
         TextFormField(
           controller: passwordController,
           obscureText: true,
+          textInputAction: TextInputAction.next,
           decoration: InputDecoration(prefixIcon: Icon(Icons.lock_outline),
               hintText: "Password"),
         ),

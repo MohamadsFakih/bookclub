@@ -134,7 +134,7 @@ class OurDatabase{
     }catch(e){
       print(e);
     }
-    return Future.delayed(Duration(seconds: 2), () => retVal);
+    return Future.delayed(Duration(seconds: 1), () => retVal);
   }
 
 
@@ -152,7 +152,7 @@ class OurDatabase{
     }catch(e){
       print(e);
     }
-    return Future.delayed(Duration(seconds: 2), () => retVal);
+    return Future.delayed(Duration(seconds: 1), () => retVal);
   }
 
 

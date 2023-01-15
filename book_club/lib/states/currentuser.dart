@@ -19,7 +19,7 @@ class CurrenState extends ChangeNotifier{
     String retval="error";
       try{
         User firebaseUser = await auth.currentUser!;
-        currentUser= await OurDatabase().getUserInfo(firebaseUser.uid);
+           currentUser=  await OurDatabase().getUserInfo(firebaseUser.uid);
 
         if(currentUser!=null){
           retval="success";

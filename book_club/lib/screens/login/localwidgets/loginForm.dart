@@ -23,6 +23,7 @@ class OurLoginForm extends StatefulWidget {
 class _OurLoginFormState extends State<OurLoginForm> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  bool _obscureText=true;
 
   void loginUser({required LoginType type, String? email,String? password,BuildContext? context})async{
       CurrenState currenState = Provider.of<CurrenState>(context!,listen: false);
@@ -97,16 +98,28 @@ class _OurLoginFormState extends State<OurLoginForm> {
 
        ),
         TextFormField(
+          keyboardType: TextInputType.emailAddress,
           controller: emailController,
+          textInputAction: TextInputAction.next,
           decoration: InputDecoration(prefixIcon: Icon(Icons.alternate_email),
           hintText: "Email"),
         ),
         SizedBox(height: 20,),
         TextFormField(
+
           controller: passwordController,
-          obscureText: true,
+          obscureText: _obscureText,
           decoration: InputDecoration(prefixIcon: Icon(Icons.lock_outline),
-              hintText: "Password"),
+              hintText: "Password",
+            suffixIcon: GestureDetector(onTap: (){
+              setState((){
+                _obscureText=!_obscureText;
+              });
+            },
+              child: Icon(_obscureText?Icons.visibility:Icons.visibility_off),
+            ),
+          ),
+
         ),
         SizedBox(height: 20,),
         RaisedButton(
