@@ -106,17 +106,20 @@ class OurDatabase{
     return retval;
   }
 
-  Future<String> createGroup(String groupName,String userId,OurBook initialBook)async{
+  Future<String> createGroup(String groupName,String userId,OurBook initialBook,String userName)async{
     String retval="error";
     List<String> members=[];
+    List<String> membersNames=[];
 
     try{
       members.add(userId);
+      membersNames.add(userName);
       DocumentReference docRef= await firestore.collection("groups").add({
         'name': groupName,
         'leader':userId,
         'members': members,
         'groupCreated': Timestamp.now(),
+        'memberNames':membersNames
       });
       await firestore.collection("users").doc(userId).update({
         'groupId':docRef.id
@@ -132,14 +135,17 @@ class OurDatabase{
     }
     return retval;
   }
-  Future<String> joinGroup(String groupID,String userId)async{
+  Future<String> joinGroup(String groupID,String userId,String userName)async{
     String retval="error";
     List<String> members=[];
+    List<String> membersNames=[];
 
     try{
       members.add(userId);
+      membersNames.add(userName);
       await firestore.collection("groups").doc(groupID).update({
-        'members':FieldValue.arrayUnion(members)
+        'members':FieldValue.arrayUnion(members),
+        'memberNames':FieldValue.arrayUnion(membersNames),
       });
       await firestore.collection("users").doc(userId).update({
         'groupId':groupID
@@ -156,7 +162,8 @@ class OurDatabase{
 
 
   Future<OurGroup> getGroupInfo(String groupId)async{
-    OurGroup retVal=OurGroup(name: "", id: "", leader: "", memebrs: [], groupCreated: Timestamp.now(), currentBookDue: Timestamp.now(), currentBookId: "");
+    OurGroup retVal=OurGroup(name: "", id: "", leader: "", memebrs: [], groupCreated: Timestamp.now(), currentBookDue: Timestamp.now(), currentBookId: "",
+    memebrsNames: []);
 
     try{
       await firestore.collection("groups").doc(groupId).snapshots().listen((event) {
@@ -167,6 +174,7 @@ class OurDatabase{
         retVal.groupCreated=event.get("groupCreated");
         retVal.currentBookId=event.get("currentBook");
         retVal.currentBookDue=event.get("currentbookDue");
+        retVal.memebrsNames=List<String>.from(event.get("memberNames"));
       });
     }catch(e){
       print(e);
@@ -224,6 +232,31 @@ class OurDatabase{
 
     return retval;
   }
+
+
+  Future<String> leaveGroup(String groupID,String userId,String userName)async{
+    String retval="error";
+
+
+    try{
+
+      await firestore.collection("groups").doc(groupID).update({
+        'members':FieldValue.arrayRemove([userId]),
+        'memberNames':FieldValue.arrayRemove([userName]),
+      });
+      await firestore.collection("users").doc(userId).update({
+        'groupId':""
+      });
+
+      retval="success";
+
+    }catch(e){
+      print(e);
+    }
+    return retval;
+  }
+
+
 
 
 }

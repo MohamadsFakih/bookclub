@@ -19,7 +19,7 @@ class _OurJoinGroupState extends State<OurJoinGroup> {
 
   void joinGroup(BuildContext context,String groupId)async{
     CurrenState currenState=Provider.of<CurrenState>(context,listen: false);
-    String returnString = await OurDatabase().joinGroup(groupId, currenState.getCurrentUser.uid);
+    String returnString = await OurDatabase().joinGroup(groupId, currenState.getCurrentUser.uid,currenState.getCurrentUser.fullname);
     if(returnString=="success"){
       Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>OurRoot(),), (route) => false);
     }

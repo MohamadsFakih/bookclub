@@ -31,7 +31,7 @@ class _OurRootState extends State<OurRoot> {
     super.didChangeDependencies();
 
     //get the state, check current user, set AuthStatus based on state
-    CurrenState currenState=Provider.of(context,listen: false);
+    CurrenState currenState=Provider.of<CurrenState>(context,listen: false);
     String returnString = await currenState.onStartUp();
     if(returnString=="success"){
 

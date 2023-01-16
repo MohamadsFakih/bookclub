@@ -4,9 +4,11 @@ import 'dart:io';
 import 'package:book_club/screens/addBookScreen/addBook.dart';
 import 'package:book_club/screens/bookstest.dart';
 import 'package:book_club/screens/noGroup/nogroup.dart';
+
 import 'package:book_club/screens/review/review.dart';
 import 'package:book_club/screens/root/root.dart';
 import 'package:book_club/screens/splashScreen/splash.dart';
+import 'package:book_club/services/database.dart';
 import 'package:book_club/states/currentGroup.dart';
 import 'package:book_club/states/currentuser.dart';
 import 'package:book_club/utils/timeleft.dart';
@@ -15,6 +17,7 @@ import 'package:book_club/widgets/ourContainer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../../widgets/SearchItem.dart';
@@ -78,13 +81,133 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void leaveGroup(BuildContext context,String gid)async{
+    CurrenState currenState=Provider.of(context,listen: false);
+    String returnString=await OurDatabase().leaveGroup(gid, currenState.getCurrentUser.uid, currenState.getCurrentUser.fullname);
+    if(returnString=="success") {
+      Navigator.pushAndRemoveUntil(
+          context, MaterialPageRoute(builder: (context) => OurRoot(),), (
+          route) => false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     CurrentGroup currentGroup=Provider.of<CurrentGroup>(context,listen: false);
+    CurrenState currenState=Provider.of(context,listen: false);
+    String uid = currenState.getCurrentUser.uid;
     String gid=currentGroup.getCurrentGroup.id;
     String bid=currentGroup.getCurrentBook.id;
+    List<String> names= currentGroup.getCurrentGroup.memebrsNames;
+    List<String> namesId= currentGroup.getCurrentGroup.memebrs;
 
-    return (gid!="" && bid!="")? Scaffold(
+    return (gid!="" && bid!="" && names!=[])? Scaffold(
+        appBar: AppBar(
+          title: Text("Home"),
+          centerTitle: true,
+          elevation: 0.0,
+          backgroundColor: Color(0xfff7911e),
+          actions: <Widget>[
+            PopupMenuButton<String>(
+              onSelected: handleClick,
+              itemBuilder: (BuildContext context) {
+                return {'Settings','History', 'Logout'}.map((String choice) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Text(choice),
+                  );
+                }).toList();
+              },
+            ),
+          ],
+
+        ),
+
+      drawer: Drawer(
+        child: Container(
+          color: Colors.grey,
+          child: Column(
+            children: [
+              Container(
+                color:Colors.white ,
+                child: DrawerHeader(
+                  child:Container(
+                    width: double.infinity,
+                    child:Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Text(currentGroup.getCurrentGroup.name,style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 18)),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              GestureDetector(child: Icon(Icons.share),onTap: (){
+                                Clipboard.setData(ClipboardData(text: currentGroup.getCurrentGroup.id))
+                                    .then((value) { //only if ->
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text("Copied Invite Link"),
+                                        duration: Duration(seconds: 2),)
+                                  );
+                                });
+                              },),
+                              SizedBox(width: 20,),
+                              Icon(Icons.door_back_door_sharp),
+
+                            ],
+                          )
+
+                        ],
+                      ),
+                    )
+
+                  ) ,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Text("Group Members" ,style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 18)),
+              ),
+              Expanded(
+                child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: names.length,
+                    scrollDirection: Axis.vertical,
+
+                    itemBuilder: (context, index){
+
+                      return Column(
+                        children: [
+                        ListTile(
+                          title: Text(names[index]),
+                          leading: Icon(namesId[index]==currentGroup.getCurrentGroup.leader? Icons.star:Icons.person),
+                          trailing: Visibility(visible: true, child: Icon( Icons.remove_circle,color: Colors.red,))
+                          ),
+                          Divider(color: Colors.black,)
+
+                      ],
+                      );
+                    }
+                ),
+              ),
+
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: RaisedButton(
+                    child: Text("Leave Group",style: TextStyle(color: Colors.red),),
+                    color: Colors.black,
+
+                    onPressed: (){
+                      leaveGroup(context, gid);
+
+                    }
+                ),
+              )
+            ],
+          ),
+        ),
+
+      ),
+
 
         body: StreamBuilder(
           stream: FirebaseFirestore.instance.collection('groups').doc((gid))
@@ -105,9 +228,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
                   return Column(
                     children: [
-                      SizedBox(height: 40,),
+                      SizedBox(height: 10,),
                       Padding(
-                        padding: const EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(10),
                         child: OurContainer(
                           child: Consumer<CurrentGroup>(
 
@@ -148,14 +271,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ],
                                     ),
                                   ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      RaisedButton(
+                                        onPressed: (){
+                                        },
+                                        child: Text("Read",style: TextStyle(color: Colors.white),),
+                                      ),
+                                      RaisedButton(
+                                        onPressed: (){
 
-                                  RaisedButton(
-                                    onPressed: (){
-
-                                      value.getDoneWithCurrentBook? null: goToReview(context);
-                                    },
-                                    child: Text("Finished Book",style: TextStyle(color: Colors.white),),
+                                          value.getDoneWithCurrentBook? null: goToReview(context);
+                                        },
+                                        child: Text("Finished Book",style: TextStyle(color: Colors.white),),
+                                      )
+                                    ],
                                   )
+
+
                                 ],
                               );
                             },
@@ -191,21 +325,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           onPressed: (){
                             goToAddBook(context);
                           },
-                          child: Text("Book Club History",
+                          child: Text("Add Book",
                             style: TextStyle(color: Colors.white),),
                         ),
                       ),
 
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 40),
-                        child: RaisedButton(
-                          onPressed: ()=>signOut(context),
-                          child: Text("Sign Out"),
-                          color: Theme.of(context).canvasColor,
-                          shape: RoundedRectangleBorder(borderRadius:  BorderRadius.circular(20.0),
-                              side: BorderSide(color: Theme.of(context).secondaryHeaderColor,width: 2)),
-                        ),
-                      ),
+
 
                     ],
                   );
@@ -215,5 +340,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
         )
     ):OurSplashScreen();
+  }
+  void handleClick(String value) {
+    switch (value) {
+      case 'Logout':
+        signOut(context);
+        break;
+      case 'Settings':
+        break;
+    }
   }
 }

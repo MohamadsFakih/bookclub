@@ -43,6 +43,7 @@ dependencies:
   intl:
   books_finder:
 
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

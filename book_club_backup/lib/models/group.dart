@@ -5,6 +5,7 @@ class OurGroup{
   String name;
   String leader;
   List<String> memebrs;
+  List<String> memebrsNames;
   Timestamp groupCreated;
   String currentBookId;
   Timestamp currentBookDue;
@@ -16,6 +17,7 @@ class OurGroup{
     required this.memebrs,
     required this.groupCreated,
     required this.currentBookDue,
-    required this.currentBookId
+    required this.currentBookId,
+    required this.memebrsNames
 });
 }

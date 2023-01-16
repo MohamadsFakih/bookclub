@@ -49,7 +49,7 @@ class _OurAddBookState extends State<OurAddBook> {
     CurrenState currenState=Provider.of<CurrenState>(context,listen: false);
     String returnString;
     if(widget.onGroupCreation){
-      returnString= await OurDatabase().createGroup(groupName, currenState.getCurrentUser.uid, book);
+      returnString= await OurDatabase().createGroup(groupName, currenState.getCurrentUser.uid, book,currenState.getCurrentUser.fullname);
     }else{
       returnString=await OurDatabase().addBook(currenState.getCurrentUser.groupId, book);
     }

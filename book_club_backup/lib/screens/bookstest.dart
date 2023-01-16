@@ -60,6 +60,7 @@ class _BookTestState extends State<BookTest> {
                   );
                   for (final book in books) {
                     final info = book.info;
+                    print(info.previewLink);
                     setState((){
                       searchedBook.add(book);
                     });

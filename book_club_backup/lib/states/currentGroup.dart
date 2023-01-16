@@ -5,7 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 
 class CurrentGroup extends ChangeNotifier{
-  OurGroup currentGroup=OurGroup(name: "", id: "", leader: "", memebrs: [], groupCreated: Timestamp.now(), currentBookDue: Timestamp.now(), currentBookId: "");
+  OurGroup currentGroup=OurGroup(name: "", id: "", leader: "", memebrs: [], groupCreated: Timestamp.now(), currentBookDue: Timestamp.now(),
+      currentBookId: "",memebrsNames: []);
   OurBook currentBook=OurBook(id: "", name: "", length: "", dateCompleted: Timestamp.now(),author: "",image: "");
   bool doneWithCurrentBook=false;
 
