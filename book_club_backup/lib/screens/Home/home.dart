@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:book_club/screens/addBookScreen/addBook.dart';
 import 'package:book_club/screens/bookstest.dart';
 import 'package:book_club/screens/noGroup/nogroup.dart';
+import 'package:book_club/screens/readBook.dart';
 
 import 'package:book_club/screens/review/review.dart';
 import 'package:book_club/screens/root/root.dart';
@@ -94,8 +95,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     CurrentGroup currentGroup=Provider.of<CurrentGroup>(context,listen: false);
-    CurrenState currenState=Provider.of(context,listen: false);
-    String uid = currenState.getCurrentUser.uid;
     String gid=currentGroup.getCurrentGroup.id;
     String bid=currentGroup.getCurrentBook.id;
     List<String> names= currentGroup.getCurrentGroup.memebrsNames;
@@ -180,7 +179,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         ListTile(
                           title: Text(names[index]),
                           leading: Icon(namesId[index]==currentGroup.getCurrentGroup.leader? Icons.star:Icons.person),
-                          trailing: Visibility(visible: true, child: Icon( Icons.remove_circle,color: Colors.red,))
                           ),
                           Divider(color: Colors.black,)
 
@@ -276,6 +274,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     children: [
                                       RaisedButton(
                                         onPressed: (){
+                                          Navigator.push(context,MaterialPageRoute(builder: (context)=>Readbook(link: currentGroup.getCurrentGroup.bookLink,)));
+
                                         },
                                         child: Text("Read",style: TextStyle(color: Colors.white),),
                                       ),
@@ -287,6 +287,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                         child: Text("Finished Book",style: TextStyle(color: Colors.white),),
                                       )
                                     ],
+                                  ),
+                                  RaisedButton(
+                                    onPressed: (){
+
+                                      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>OurRoot(),), (route) => false);
+
+                                    },
+                                    child: Text("Refresh",style: TextStyle(color: Colors.white),),
                                   )
 
 

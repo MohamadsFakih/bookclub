@@ -18,7 +18,8 @@ class _OurCreateGroupState extends State<OurCreateGroup> {
 
   void goToAddBook(BuildContext context,String groupName)async{
 
-      Navigator.push(context, MaterialPageRoute(builder: (context)=> OurAddBook(groupName: groupName, onGroupCreation: true)));
+      Navigator.push(context, MaterialPageRoute(builder: (context)=> OurAddBook(groupName: groupName, onGroupCreation: true,
+      name: "",bookLink: "",length: "",author: "",image: "",)));
 
 
   }

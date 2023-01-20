@@ -59,7 +59,8 @@ class OurDatabase{
       //add book to group scehdule
       await firestore.collection("groups").doc(groupId).update({
         'currentBook': docRef.id,
-        "currentbookDue":book.dateCompleted
+        "currentbookDue":book.dateCompleted,
+        "bookLink":book.bookLink
       });
       retval = "success";
     } catch (e) {
@@ -67,28 +68,7 @@ class OurDatabase{
     }
     return retval;
   }
-
-  Future<String> addListBook(String groupId,String name,String author,String length,Timestamp date,String img)async {
-    String retval = "error";
-    try {
-      DocumentReference docRef = await firestore.collection("groups").doc(groupId).collection("books").add({
-        'name': name,
-        'author': author,
-        'length': length,
-        'dateCompleted': date,
-        'image':img
-      });
-      //add book to group scehdule
-      await firestore.collection("groups").doc(groupId).update({
-        'currentBook': docRef.id,
-        "currentbookDue":Timestamp.fromDate(DateTime(2023,10,24))
-      });
-      retval = "success";
-    } catch (e) {
-      print(e);
-    }
-    return retval;
-  }
+  
 
 
   Future<String> changeBook(String groupId,String bookId)async {
@@ -163,7 +143,7 @@ class OurDatabase{
 
   Future<OurGroup> getGroupInfo(String groupId)async{
     OurGroup retVal=OurGroup(name: "", id: "", leader: "", memebrs: [], groupCreated: Timestamp.now(), currentBookDue: Timestamp.now(), currentBookId: "",
-    memebrsNames: []);
+    memebrsNames: [],bookLink: "");
 
     try{
       await firestore.collection("groups").doc(groupId).snapshots().listen((event) {
@@ -175,6 +155,7 @@ class OurDatabase{
         retVal.currentBookId=event.get("currentBook");
         retVal.currentBookDue=event.get("currentbookDue");
         retVal.memebrsNames=List<String>.from(event.get("memberNames"));
+        retVal.bookLink=event.get("bookLink");
       });
     }catch(e){
       print(e);
@@ -184,7 +165,7 @@ class OurDatabase{
 
 
   Future<OurBook> getCurrentBook(String groupId,String bookId)async{
-    OurBook retVal=OurBook(id: "", name: "", length: "", dateCompleted: Timestamp.now(),author: "",image: "");
+    OurBook retVal=OurBook(id: "", name: "", length: "", dateCompleted: Timestamp.now(),author: "",image: "",bookLink: "");
 
     try{
       await firestore.collection("groups").doc(groupId).collection("books").doc(bookId).snapshots().listen((event) {
@@ -194,6 +175,7 @@ class OurDatabase{
         retVal.dateCompleted=event.get("dateCompleted");
         retVal.author=event.get("author");
         retVal.image=event.get("image");
+        retVal.bookLink=event.get("bookLink");
       });
     }catch(e){
       print(e);
@@ -255,6 +237,7 @@ class OurDatabase{
     }
     return retval;
   }
+
 
 
 

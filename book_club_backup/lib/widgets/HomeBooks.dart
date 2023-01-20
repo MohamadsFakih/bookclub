@@ -36,15 +36,6 @@ class HomeBooks extends StatefulWidget {
 
 class HomeBooksState extends State<HomeBooks> {
 
-  void addBook(BuildContext context,String groupName,String name,String author,String length,Timestamp date,String img)async{
-    String returnString;
-    returnString=await OurDatabase().addListBook(groupName, name, author, length, date, img);
-
-    if(returnString=="success"){
-      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>OurRoot(),), (route) => false);
-    }
-
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +45,7 @@ class HomeBooksState extends State<HomeBooks> {
       child: GestureDetector(
         onTap: ()async{
           await OurDatabase().changeBook(widget.gid, widget.bid);
+
         },
         child: OurContainer(
             child:
@@ -71,7 +63,21 @@ class HomeBooksState extends State<HomeBooks> {
                         children: [
                           SizedBox(width: 160, child: Text(widget.name,textAlign: TextAlign.center,style: TextStyle(fontSize: 16),maxLines: 2,overflow: TextOverflow.fade,softWrap: false,)),
                           Text(widget.author,textAlign: TextAlign.center,style: TextStyle(fontSize: 12),),
-                          Text(widget.pages.toString()+" Pages",textAlign: TextAlign.center,style: TextStyle(fontSize: 12,color: Colors.grey),)
+                          Text(widget.pages.toString()+" Pages",textAlign: TextAlign.center,style: TextStyle(fontSize: 12,color: Colors.grey),),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              GestureDetector(
+                                child: Icon(Icons.remove_circle,color: Colors.red,),
+                                onTap: (){
+                                  setState((){
+                                    FirebaseFirestore.instance.collection("groups").doc(widget.gid).collection("books").doc(widget.bid).delete();
+
+                                  });
+                                },
+                              )
+                            ],
+                          )
                         ],
                       ),
                     )

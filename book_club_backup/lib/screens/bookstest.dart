@@ -21,13 +21,6 @@ class _BookTestState extends State<BookTest> {
 
   List<Book> searchedBook=[];
 
-  void goToAddBook(BuildContext context) {
-    CurrentGroup currentGroup = Provider.of<CurrentGroup>(
-        context, listen: false);
-    Navigator.push(context, MaterialPageRoute(builder: (context) =>
-        OurAddBook(groupName: currentGroup.getCurrentGroup.name,
-            onGroupCreation: true)));
-  }
   @override
   Widget build(BuildContext context) {
     
@@ -45,7 +38,7 @@ class _BookTestState extends State<BookTest> {
 
               ),
             ),
-            SizedBox(height: 30,),
+            SizedBox(height: 15,),
 
             RaisedButton(
               child: Text("Search"),
@@ -60,7 +53,7 @@ class _BookTestState extends State<BookTest> {
                   );
                   for (final book in books) {
                     final info = book.info;
-                    print(info.previewLink);
+
                     setState((){
                       searchedBook.add(book);
                     });
@@ -73,7 +66,9 @@ class _BookTestState extends State<BookTest> {
                 child: Text("Add Manually"),
                 onPressed: () {
 
-                  
+                  Navigator.push(context,MaterialPageRoute(builder: (context)=>OurAddBook(groupName: widget.gid, onGroupCreation: false,
+                  bookLink: "",name: "",author: "",length: "",image: "https://i.postimg.cc/cLQRLt7f/content.jpg",)));
+
                 }
             ),
            Expanded(
@@ -85,8 +80,9 @@ class _BookTestState extends State<BookTest> {
                  itemBuilder: (context, index){
                  Book b =searchedBook[index];
                  Uri? uri=searchedBook[index].info.imageLinks["thumbnail"];
+
                       return SearchItem(name: b.info.title, author: b.info.authors.isEmpty?"":b.info.authors[0],pages: b.info.pageCount.toString(),
-                        categories: b.info.categories,image: uri.toString(),gid: widget.gid,
+                        categories: b.info.categories,image: uri==null? "https://i.postimg.cc/cLQRLt7f/content.jpg":uri.toString(),gid: widget.gid,
                       );
                  }
              ),

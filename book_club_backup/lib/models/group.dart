@@ -9,6 +9,7 @@ class OurGroup{
   Timestamp groupCreated;
   String currentBookId;
   Timestamp currentBookDue;
+  String bookLink;
 
   OurGroup({
     required this.name,
@@ -18,6 +19,7 @@ class OurGroup{
     required this.groupCreated,
     required this.currentBookDue,
     required this.currentBookId,
-    required this.memebrsNames
+    required this.memebrsNames,
+    required this.bookLink
 });
 }

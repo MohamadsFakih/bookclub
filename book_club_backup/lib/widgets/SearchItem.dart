@@ -1,3 +1,4 @@
+import 'package:book_club/screens/addBookScreen/addBook.dart';
 import 'package:book_club/states/currentGroup.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -22,7 +23,8 @@ class SearchItem extends StatefulWidget {
     required this.author,
     required this.pages,
     required this.categories,
-    required this.image,required this.gid
+    required this.image,
+    required this.gid
   }) : super(key: key);
 
   @override
@@ -31,15 +33,6 @@ class SearchItem extends StatefulWidget {
 
 class _SearchItemState extends State<SearchItem> {
 
-  void addBook(BuildContext context,String groupName,String name,String author,String length,Timestamp date,String img)async{
-    String returnString;
-    returnString=await OurDatabase().addListBook(groupName, name, author, length, date, img);
-
-    if(returnString=="success"){
-      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>OurRoot(),), (route) => false);
-    }
-
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +41,9 @@ class _SearchItemState extends State<SearchItem> {
       padding: const EdgeInsets.all(10.0),
       child: GestureDetector(
         onTap: (){
-          addBook(context, widget.gid, widget.name, widget.author, widget.pages, Timestamp.now(), widget.image.toString());
+          Navigator.push(context,MaterialPageRoute(builder: (context)=>OurAddBook(groupName: widget.gid, onGroupCreation: false, bookLink: "", name: widget.name,
+              length: widget.pages, author: widget.author,image: widget.image,)));
+
         },
         child: OurContainer(
             child:

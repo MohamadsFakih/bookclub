@@ -15,7 +15,7 @@ class OurTimeLeft{
       retval[0]=daysUntil.toString() +" days "+hoursUntil.toString()+" hours \n"+minutesUntil.toString()+" minutes "+secondsUntil.toString()+" seconds";
 
     }else if(hoursUntil>0){
-      retval[0]=hoursUntil.toString()+" hours "+minutesUntil.toString()+" minutes "+secondsUntil.toString()+" seconds";
+      retval[0]=hoursUntil.toString()+" hours \n"+minutesUntil.toString()+" minutes "+secondsUntil.toString()+" seconds";
     }else if(minutesUntil>0){
       retval[0]=minutesUntil.toString()+" minutes "+secondsUntil.toString()+" seconds";
     }else if(secondsUntil>0){

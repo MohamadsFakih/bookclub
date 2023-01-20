@@ -42,7 +42,7 @@ dependencies:
   flutter_datetime_picker:
   intl:
   books_finder:
-
+  webview_flutter: ^2.0.12
 
 dev_dependencies:
   flutter_test:

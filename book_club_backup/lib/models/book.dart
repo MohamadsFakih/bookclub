@@ -7,6 +7,7 @@ class OurBook{
   String author;
   Timestamp dateCompleted;
   String image;
+  String bookLink;
 
   OurBook({
     required this.id,
@@ -14,6 +15,7 @@ class OurBook{
     required this.length,
     required this.dateCompleted,
     required this.author,
-    required this.image
+    required this.image,
+    required this.bookLink
 });
 }

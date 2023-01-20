@@ -15,9 +15,19 @@ import 'package:provider/provider.dart';
 class OurAddBook extends StatefulWidget {
   final bool onGroupCreation;
   final String groupName;
+  final String name;
+  final String author;
+  final String length;
+  final String bookLink;
+  final String image;
   const OurAddBook({Key? key,
   required this.groupName,
-    required this.onGroupCreation
+    required this.onGroupCreation,
+    required this.bookLink,
+    required this.name,
+    required this.length,
+    required this.author,
+    required this.image
 
   }) : super(key: key);
 
@@ -28,11 +38,11 @@ class OurAddBook extends StatefulWidget {
 }
 
 class _OurAddBookState extends State<OurAddBook> {
-  TextEditingController bookNameController=TextEditingController();
-  TextEditingController authorController=TextEditingController();
-  TextEditingController lengthController=TextEditingController();
+
 
   DateTime selectedDate=DateTime.now();
+
+
 
   Future<void> selectDate(BuildContext context)async{
     final DateTime? picked=await DatePicker.showDateTimePicker(context,showTitleActions: true);
@@ -62,6 +72,10 @@ class _OurAddBookState extends State<OurAddBook> {
 
   @override
   Widget build(BuildContext context) {
+    TextEditingController bookNameController=TextEditingController(text: widget.name);
+    TextEditingController authorController=TextEditingController(text: widget.author);
+    TextEditingController lengthController=TextEditingController(text: widget.length);
+    TextEditingController linkCoontroller=TextEditingController();
     return Scaffold(
       body: ListView(
         children: [
@@ -105,6 +119,15 @@ class _OurAddBookState extends State<OurAddBook> {
                         ),
                       ),
                       SizedBox(height: 20,),
+                      TextFormField(
+                        keyboardType: TextInputType.text,
+                        controller: linkCoontroller,
+                        decoration: InputDecoration(
+                          prefixIcon: Icon(Icons.link),
+                          hintText: "Book Link",
+                        ),
+                      ),
+                      SizedBox(height: 20,),
                       //datepicker
                       Text(DateFormat.yMMMd("en_US").format(selectedDate) ),
                       Text(selectedDate.hour.toString()+":"+selectedDate.minute.toString()),
@@ -118,12 +141,9 @@ class _OurAddBookState extends State<OurAddBook> {
                       RaisedButton(
                         onPressed: (){
                           OurBook book=OurBook(id: "", name: bookNameController.text.trim(),
-                              length: lengthController.text.toString().trim(), dateCompleted: Timestamp.fromDate(selectedDate),
-                              author: authorController.text.trim(),image: "");
-
-
+                              length: lengthController.text.trim(), dateCompleted: Timestamp.fromDate(selectedDate),
+                              author: authorController.text.trim(),image:widget.image ,bookLink: linkCoontroller.text.trim());
                             addBook(context, widget.groupName, book);
-
 
                         },
                         child: Padding(
