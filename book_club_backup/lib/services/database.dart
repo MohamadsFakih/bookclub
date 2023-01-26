@@ -54,7 +54,7 @@ class OurDatabase{
         'author': book.author,
         'length': book.length,
         'dateCompleted': book.dateCompleted,
-        'image':book.image
+        'image':book.image,
       });
       //add book to group scehdule
       await firestore.collection("groups").doc(groupId).update({
@@ -176,6 +176,7 @@ class OurDatabase{
         retVal.author=event.get("author");
         retVal.image=event.get("image");
         retVal.bookLink=event.get("bookLink");
+
       });
     }catch(e){
       print(e);
@@ -184,13 +185,30 @@ class OurDatabase{
   }
 
 
-  Future<String> finishedBook(String groupId,String bookId,String uid,int rating,String review) async{
+  Future<String> finishedBook(String groupId,OurBook book,String uid,int rating,String review,String uname) async{
     String retval="error";
     try{
-      await firestore.collection("groups").doc(groupId).collection("books").doc(bookId).collection("reviews").doc(uid).set({
+
+      await firestore.collection("groups").doc(groupId).collection("Fbooks").doc(book.id).set({
+        'name': book.name,
+        'author': book.author,
+        'length': book.length,
+        'dateCompleted': book.dateCompleted,
+        'image':book.image,
+      });
+
+
+
+      await firestore.collection("groups").doc(groupId).collection("Fbooks").doc(book.id).collection("reviews").doc(uid).set({
         'rating':rating,
         'review':review,
+        'from':uname
       });
+
+
+
+
+
       retval="success";
     }catch(e){
       print(e);

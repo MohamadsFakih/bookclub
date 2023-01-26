@@ -77,14 +77,19 @@ class _OurAddBookState extends State<OurAddBook> {
     TextEditingController lengthController=TextEditingController(text: widget.length);
     TextEditingController linkCoontroller=TextEditingController();
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Add Book",style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),
+        centerTitle: true,
+        backgroundColor: Color(0xfff73366ff),
+        elevation: 0.0,
+        leading: IconButton(icon: Icon(Icons.arrow_back),
+          onPressed: (){
+            Navigator.pop(context);
+          },),
+      ),
+
       body: ListView(
         children: [
-          Padding(
-            padding: EdgeInsets.all(20.0),
-            child: Row(
-              children: [BackButton()],
-            ),
-          ),
 
           Column(
             mainAxisAlignment: MainAxisAlignment.center,

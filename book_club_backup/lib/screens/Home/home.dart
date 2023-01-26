@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:book_club/screens/History/history.dart';
 import 'package:book_club/screens/addBookScreen/addBook.dart';
 import 'package:book_club/screens/bookstest.dart';
 import 'package:book_club/screens/noGroup/nogroup.dart';
@@ -68,7 +69,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
   void goToReview(BuildContext context){
     CurrentGroup currentGroup=Provider.of<CurrentGroup>(context,listen: false);
-    Navigator.push(context,MaterialPageRoute(builder: (context)=>OurReview(currentGroup: currentGroup,)));
+    CurrenState currenState=Provider.of(context,listen: false);
+    Navigator.push(context,MaterialPageRoute(builder: (context)=>OurReview(currentGroup: currentGroup,currenState: currenState,)));
 
   }
 
@@ -105,8 +107,13 @@ class _HomeScreenState extends State<HomeScreen> {
           title: Text("Home"),
           centerTitle: true,
           elevation: 0.0,
-          backgroundColor: Color(0xfff7911e),
+          backgroundColor: Color(0xfff73366ff),
           actions: <Widget>[
+            GestureDetector(
+                onTap: (){
+                  goToAddBook(context);
+                },
+                child: Icon(Icons.add)),
             PopupMenuButton<String>(
               onSelected: handleClick,
               itemBuilder: (BuildContext context) {
@@ -118,6 +125,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 }).toList();
               },
             ),
+
           ],
 
         ),
@@ -306,6 +314,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       Text("Current Books",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),),
+                      SizedBox(height: 8,),
 
                       Expanded(
                         child: ListView.builder(
@@ -327,17 +336,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             }
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 40,vertical: 10),
-                        child: RaisedButton(
-                          onPressed: (){
-                            goToAddBook(context);
-                          },
-                          child: Text("Add Book",
-                            style: TextStyle(color: Colors.white),),
-                        ),
-                      ),
-
 
 
                     ],
@@ -350,11 +348,15 @@ class _HomeScreenState extends State<HomeScreen> {
     ):OurSplashScreen();
   }
   void handleClick(String value) {
+    CurrentGroup currentGroup=Provider.of<CurrentGroup>(context,listen: false);
     switch (value) {
       case 'Logout':
         signOut(context);
         break;
       case 'Settings':
+        break;
+      case 'History':
+        Navigator.push(context,MaterialPageRoute(builder: (context)=>OurHistory(gid: currentGroup.getCurrentGroup.id,)));
         break;
     }
   }

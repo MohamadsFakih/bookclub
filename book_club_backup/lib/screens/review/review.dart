@@ -8,8 +8,10 @@ import '../../widgets/ourContainer.dart';
 
 class OurReview extends StatefulWidget {
   final CurrentGroup currentGroup;
+  final CurrenState currenState;
   const OurReview({Key? key,
-    required this.currentGroup
+    required this.currentGroup,
+    required this.currenState
 
   }) : super(key: key);
 
@@ -84,13 +86,13 @@ class _OurReviewState extends State<OurReview> {
                           onPressed: (){
                               String uid=Provider.of<CurrenState>(context,listen: false).getCurrentUser.uid;
 
-                              widget.currentGroup.finishedBook(uid, dropdownValue!, reviewController.text.trim());
+                              widget.currentGroup.finishedBook(uid, dropdownValue!, reviewController.text.trim(),widget.currenState.getCurrentUser.fullname);
                               Navigator.pop(context);
                           },
                           child: Padding(
                             padding: EdgeInsets.symmetric(horizontal: 100),
                             child: Text("Review",style: TextStyle(color: Colors.white,
-                                fontWeight: FontWeight.bold,fontSize: 20.0),),
+                                fontWeight: FontWeight.bold,fontSize: 18.0),),
                           ),
                         )
                       ],

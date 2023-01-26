@@ -21,7 +21,7 @@ class OurTimeLeft{
     }else if(secondsUntil>0){
       retval[0]=secondsUntil.toString()+" seconds";
     }else{
-      retval[0]="Error";
+      retval[0]="Timer Ended";
     }
 
 
