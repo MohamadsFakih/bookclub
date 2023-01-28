@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:book_club/models/book.dart';
+import 'package:book_club/models/group.dart';
 import 'package:book_club/screens/History/history.dart';
 import 'package:book_club/screens/addBookScreen/addBook.dart';
 import 'package:book_club/screens/bookstest.dart';
@@ -17,11 +19,13 @@ import 'package:book_club/utils/timeleft.dart';
 import 'package:book_club/widgets/HomeBooks.dart';
 import 'package:book_club/widgets/ourContainer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/user.dart';
 import '../../widgets/SearchItem.dart';
 
 
@@ -61,18 +65,12 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  void goToAddBook(BuildContext context){
+  void goToAddBook(BuildContext context,String gid){
 
-    CurrentGroup currentGroup=Provider.of<CurrentGroup>(context,listen: false);
-    Navigator.push(context,MaterialPageRoute(builder: (context)=>BookTest(gid: currentGroup.getCurrentGroup.id,)));
-
-  }
-  void goToReview(BuildContext context){
-    CurrentGroup currentGroup=Provider.of<CurrentGroup>(context,listen: false);
-    CurrenState currenState=Provider.of(context,listen: false);
-    Navigator.push(context,MaterialPageRoute(builder: (context)=>OurReview(currentGroup: currentGroup,currenState: currenState,)));
+    Navigator.push(context,MaterialPageRoute(builder: (context)=>BookTest(gid:gid,onGroupCreation: false,)));
 
   }
+
 
   void signOut(BuildContext context)async{
     CurrenState currenState=Provider.of(context,listen: false);
@@ -84,9 +82,9 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void leaveGroup(BuildContext context,String gid)async{
+  void leaveGroup(BuildContext context,String gid,String uid,String name)async{
     CurrenState currenState=Provider.of(context,listen: false);
-    String returnString=await OurDatabase().leaveGroup(gid, currenState.getCurrentUser.uid, currenState.getCurrentUser.fullname);
+    String returnString=await OurDatabase().leaveGroup(gid,uid, currenState.getCurrentUser.fullname);
     if(returnString=="success") {
       Navigator.pushAndRemoveUntil(
           context, MaterialPageRoute(builder: (context) => OurRoot(),), (
@@ -97,12 +95,15 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     CurrentGroup currentGroup=Provider.of<CurrentGroup>(context,listen: false);
-    String gid=currentGroup.getCurrentGroup.id;
-    String bid=currentGroup.getCurrentBook.id;
-    List<String> names= currentGroup.getCurrentGroup.memebrsNames;
-    List<String> namesId= currentGroup.getCurrentGroup.memebrs;
+    CurrenState currenState=Provider.of(context,listen: false);
+    OurUser currentUser=currenState.getCurrentUser;
+    OurGroup currentG=currentGroup.getCurrentGroup;
+    OurBook book=currentGroup.getCurrentBook;
 
-    return (gid!="" && bid!="" && names!=[])? Scaffold(
+    List<String> names= currentG.memebrsNames;
+    List<String> namesId= currentG.memebrs;
+
+    return (currentG.id!="" && book.id!="" && names!=[])? Scaffold(
         appBar: AppBar(
           title: Text("Home"),
           centerTitle: true,
@@ -111,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
           actions: <Widget>[
             GestureDetector(
                 onTap: (){
-                  goToAddBook(context);
+                  goToAddBook(context,currentG.id);
                 },
                 child: Icon(Icons.add)),
             PopupMenuButton<String>(
@@ -135,40 +136,36 @@ class _HomeScreenState extends State<HomeScreen> {
           color: Colors.grey,
           child: Column(
             children: [
-              Container(
-                color:Colors.white ,
-                child: DrawerHeader(
-                  child:Container(
-                    width: double.infinity,
-                    child:Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Text(currentGroup.getCurrentGroup.name,style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 18)),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              GestureDetector(child: Icon(Icons.share),onTap: (){
-                                Clipboard.setData(ClipboardData(text: currentGroup.getCurrentGroup.id))
-                                    .then((value) { //only if ->
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text("Copied Invite Link"),
-                                        duration: Duration(seconds: 2),)
-                                  );
-                                });
-                              },),
-                              SizedBox(width: 20,),
-                              Icon(Icons.door_back_door_sharp),
+              DrawerHeader(
+                child:Container(
+                  width: double.infinity,
+                  child:Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text(currentG.name,style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 18)),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            GestureDetector(child: Icon(Icons.share),onTap: (){
+                              Clipboard.setData(ClipboardData(text: currentG.id))
+                                  .then((value) { //only if ->
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text("Copied Invite Link"),
+                                      duration: Duration(seconds: 2),)
+                                );
+                              });
+                            },),
 
-                            ],
-                          )
 
-                        ],
-                      ),
-                    )
+                          ],
+                        )
 
-                  ) ,
-                ),
+                      ],
+                    ),
+                  )
+
+                ) ,
               ),
               Padding(
                 padding: const EdgeInsets.all(12.0),
@@ -186,7 +183,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                         ListTile(
                           title: Text(names[index]),
-                          leading: Icon(namesId[index]==currentGroup.getCurrentGroup.leader? Icons.star:Icons.person),
+                          leading: Icon(namesId[index]==currentG.leader? Icons.star:Icons.person),
                           ),
                           Divider(color: Colors.black,)
 
@@ -199,11 +196,11 @@ class _HomeScreenState extends State<HomeScreen> {
               Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: RaisedButton(
-                    child: Text("Leave Group",style: TextStyle(color: Colors.red),),
+                    child: Text(currentUser.uid==currentG.leader?"Delete Group":"Leave Group",style: TextStyle(color: Colors.red),),
                     color: Colors.black,
 
                     onPressed: (){
-                      leaveGroup(context, gid);
+                      leaveGroup(context, currentG.id,currentUser.uid,currentUser.fullname);
 
                     }
                 ),
@@ -216,8 +213,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
         body: StreamBuilder(
-          stream: FirebaseFirestore.instance.collection('groups').doc((gid))
-              .collection("books").doc(bid).snapshots(),
+          stream: FirebaseFirestore.instance.collection('groups').doc((currentG.id))
+              .collection("books").doc(book.id).snapshots(),
           builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot
               ) {
             if( !snapshot.hasData ) {
@@ -226,7 +223,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
             return StreamBuilder(
-              stream: FirebaseFirestore.instance.collection('groups').doc((gid))
+              stream: FirebaseFirestore.instance.collection('groups').doc((currentG.id))
                   .collection("books").snapshots(),
                 builder:(BuildContext context,AsyncSnapshot<QuerySnapshot> snapshot2){
                   if( !snapshot2.hasData ) {
@@ -246,7 +243,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     children: [
-                                      Image(image: NetworkImage(snapshot.data['image'])),
+                                      ClipRRect(borderRadius: BorderRadius.circular(10),child: Image(image: NetworkImage(snapshot.data['image']))),
                                       Padding(
                                         padding: const EdgeInsets.all(5.0),
                                         child: Column(
@@ -282,7 +279,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     children: [
                                       RaisedButton(
                                         onPressed: (){
-                                          Navigator.push(context,MaterialPageRoute(builder: (context)=>Readbook(link: currentGroup.getCurrentGroup.bookLink,)));
+                                          Navigator.push(context,MaterialPageRoute(builder: (context)=>Readbook(link: currentG.bookLink,)));
 
                                         },
                                         child: Text("Read",style: TextStyle(color: Colors.white),),
@@ -290,7 +287,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                       RaisedButton(
                                         onPressed: (){
 
-                                          value.getDoneWithCurrentBook? null: goToReview(context);
+                                          value.getDoneWithCurrentBook? null:     Navigator.push(context,MaterialPageRoute(builder: (context)=>OurReview(currentGroup: currentGroup,userName: currentUser.fullname,uid: currentUser.uid,
+                                          bookName: book.name,image: book.image,author: book.author,)));
+                                          ;
                                         },
                                         child: Text("Finished Book",style: TextStyle(color: Colors.white),),
                                       )
@@ -327,11 +326,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
                               if(document!=null){
                                 return HomeBooks(name: document["name"], author: document["author"],pages: document["length"],
-                                  categories: [""],image: document["image"],gid: currentGroup.getCurrentGroup.id,bid: document.id,);
+                                  categories: [""],image: document["image"],gid: currentG.id,bid: document.id,
+                                isowner: currentUser.uid==currentG.leader? true:false,);
                               }
 
                               return HomeBooks(name: "", author: "",pages: "0",
-                                categories: [""],image: "",gid: "",bid: "",
+                                categories: [""],image: "",gid: "",bid: "",isowner: false,
                               );
                             }
                         ),

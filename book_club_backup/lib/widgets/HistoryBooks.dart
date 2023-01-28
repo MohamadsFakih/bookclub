@@ -1,5 +1,6 @@
 
 
+import 'package:book_club/screens/reviews/reviews.dart';
 import 'package:book_club/states/currentGroup.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -44,7 +45,7 @@ class HistoryBooksState extends State<HistoryBooks> {
       padding: const EdgeInsets.all(10.0),
       child: GestureDetector(
         onTap: ()async{
-
+          Navigator.push(context,MaterialPageRoute(builder: (context)=> Reviews(bid: widget.bid, gid: widget.gid,bookName: widget.name,image: widget.image,author: widget.author,)));
 
         },
         child: OurContainer(
@@ -54,7 +55,7 @@ class HistoryBooksState extends State<HistoryBooks> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Image(image: NetworkImage(widget.image),height: 80,),
+                    ClipRRect(borderRadius: BorderRadius.circular(10),child: Image(image: NetworkImage(widget.image),height: 80,)),
                     Padding(
                       padding: const EdgeInsets.all(15.0),
                       child: Column(
@@ -90,6 +91,6 @@ class HistoryBooksState extends State<HistoryBooks> {
             )
         ),
       ),
-    );;
+    );
   }
 }

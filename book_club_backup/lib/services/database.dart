@@ -185,7 +185,7 @@ class OurDatabase{
   }
 
 
-  Future<String> finishedBook(String groupId,OurBook book,String uid,int rating,String review,String uname) async{
+  Future<String> finishedBook(String groupId,OurBook book,String uid,double rating,String review,String uname) async{
     String retval="error";
     try{
 

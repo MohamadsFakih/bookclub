@@ -11,6 +11,7 @@ import '../states/currentuser.dart';
 import 'ourContainer.dart';
 
 class SearchItem extends StatefulWidget {
+  final bool onGroupCreation;
  final  String name;
  final String author;
  final String pages;
@@ -24,7 +25,8 @@ class SearchItem extends StatefulWidget {
     required this.pages,
     required this.categories,
     required this.image,
-    required this.gid
+    required this.gid,
+    required this.onGroupCreation
   }) : super(key: key);
 
   @override
@@ -41,7 +43,7 @@ class _SearchItemState extends State<SearchItem> {
       padding: const EdgeInsets.all(10.0),
       child: GestureDetector(
         onTap: (){
-          Navigator.push(context,MaterialPageRoute(builder: (context)=>OurAddBook(groupName: widget.gid, onGroupCreation: false, bookLink: "", name: widget.name,
+          Navigator.push(context,MaterialPageRoute(builder: (context)=>OurAddBook(groupName: widget.gid, onGroupCreation: widget.onGroupCreation, bookLink: "", name: widget.name,
               length: widget.pages, author: widget.author,image: widget.image,)));
 
         },
@@ -52,7 +54,7 @@ class _SearchItemState extends State<SearchItem> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Image(image: NetworkImage(widget.image),height: 80,),
+                ClipRRect(borderRadius: BorderRadius.circular(10),child: Image(image: NetworkImage(widget.image),height: 80,)),
                 Padding(
                   padding: const EdgeInsets.all(15.0),
                   child: Column(

@@ -1,6 +1,7 @@
 import 'dart:ffi';
 
 import 'package:book_club/models/book.dart';
+import 'package:book_club/models/user.dart';
 import 'package:book_club/screens/root/root.dart';
 import 'package:book_club/services/database.dart';
 import 'package:book_club/states/currentuser.dart';
@@ -57,11 +58,13 @@ class _OurAddBookState extends State<OurAddBook> {
 
   void addBook(BuildContext context,String groupName,OurBook book)async{
     CurrenState currenState=Provider.of<CurrenState>(context,listen: false);
+    OurUser us =currenState.getCurrentUser;
     String returnString;
     if(widget.onGroupCreation){
-      returnString= await OurDatabase().createGroup(groupName, currenState.getCurrentUser.uid, book,currenState.getCurrentUser.fullname);
+      print("fetit");
+      returnString= await OurDatabase().createGroup(groupName, us.uid, book,us.fullname);
     }else{
-      returnString=await OurDatabase().addBook(currenState.getCurrentUser.groupId, book);
+      returnString=await OurDatabase().addBook(us.groupId, book);
     }
     if(returnString=="success"){
       Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>OurRoot(),), (route) => false);
@@ -145,7 +148,7 @@ class _OurAddBookState extends State<OurAddBook> {
 
                       RaisedButton(
                         onPressed: (){
-                          OurBook book=OurBook(id: "", name: bookNameController.text.trim(),
+                          OurBook book=OurBook(id: widget.groupName, name: bookNameController.text.trim(),
                               length: lengthController.text.trim(), dateCompleted: Timestamp.fromDate(selectedDate),
                               author: authorController.text.trim(),image:widget.image ,bookLink: linkCoontroller.text.trim());
                             addBook(context, widget.groupName, book);

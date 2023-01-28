@@ -1,3 +1,4 @@
+import 'package:book_club/screens/noGroup/nogroup.dart';
 import 'package:book_club/screens/signup/signup.dart';
 import 'package:book_club/states/currentuser.dart';
 import 'package:flutter/cupertino.dart';
@@ -27,7 +28,7 @@ class _OurSignUpFormState extends State<OurSignUpForm> {
     try{
       String returnString=await currenState.signUpUser(email, password,fullName);
       if(returnString=="success"){
-        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>HomeScreen(),), (route) => false);
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>OurnoGroup(),), (route) => false);
       }else{
         Scaffold.of(context).showSnackBar(
             SnackBar(content: Text(returnString),

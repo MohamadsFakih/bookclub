@@ -9,8 +9,9 @@ import '../states/currentGroup.dart';
 
 class BookTest extends StatefulWidget {
   final String gid;
+  final bool onGroupCreation;
   const BookTest({Key? key,
-  required this.gid}) : super(key: key);
+  required this.gid,required this.onGroupCreation}) : super(key: key);
 
   @override
   State<BookTest> createState() => _BookTestState();
@@ -79,7 +80,7 @@ class _BookTestState extends State<BookTest> {
                   child: Text("Add Manually"),
                   onPressed: () {
 
-                    Navigator.push(context,MaterialPageRoute(builder: (context)=>OurAddBook(groupName: widget.gid, onGroupCreation: false,
+                    Navigator.push(context,MaterialPageRoute(builder: (context)=>OurAddBook(groupName: widget.gid, onGroupCreation: widget.onGroupCreation,
                     bookLink: "",name: "",author: "",length: "",image: "https://i.postimg.cc/cLQRLt7f/content.jpg",)));
 
                   }
@@ -97,6 +98,7 @@ class _BookTestState extends State<BookTest> {
 
                         return SearchItem(name: b.info.title, author: b.info.authors.isEmpty?"":b.info.authors[0],pages: b.info.pageCount.toString(),
                           categories: b.info.categories,image: uri==null? "https://i.postimg.cc/cLQRLt7f/content.jpg":uri.toString(),gid: widget.gid,
+                          onGroupCreation: widget.onGroupCreation,
                         );
                    }
                ),

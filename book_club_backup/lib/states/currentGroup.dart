@@ -28,7 +28,7 @@ class CurrentGroup extends ChangeNotifier{
 
   }
 
-  void finishedBook(String userUid,int rating,String review,String userName)async{
+  void finishedBook(String userUid,double rating,String review,String userName)async{
     try{
       await OurDatabase().finishedBook(currentGroup.id, currentBook, userUid, rating, review,userName);
       doneWithCurrentBook=true;

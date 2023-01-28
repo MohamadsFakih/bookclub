@@ -19,6 +19,7 @@ class HomeBooks extends StatefulWidget {
   final String image;
   final String gid;
   final String bid;
+  final bool isowner;
 
   const HomeBooks({Key? key,
     required this.name,
@@ -27,7 +28,8 @@ class HomeBooks extends StatefulWidget {
     required this.categories,
     required this.image,
     required this.gid,
-    required this.bid
+    required this.bid,
+    required this.isowner
   }) : super(key: key);
 
   @override
@@ -44,7 +46,20 @@ class HomeBooksState extends State<HomeBooks> {
       padding: const EdgeInsets.all(10.0),
       child: GestureDetector(
         onTap: ()async{
-          await OurDatabase().changeBook(widget.gid, widget.bid);
+
+          if(widget.isowner){
+            await OurDatabase().changeBook(widget.gid, widget.bid);
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("Changed book, press Refresh"),
+                  duration: Duration(seconds: 2),)
+            );
+          }else{
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("Only the group admin can change the current boook"),
+                  duration: Duration(seconds: 2),)
+            );
+          }
+
 
         },
         child: OurContainer(
@@ -54,7 +69,7 @@ class HomeBooksState extends State<HomeBooks> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Image(image: NetworkImage(widget.image),height: 80,),
+                    ClipRRect(borderRadius: BorderRadius.circular(10),child: Image(image: NetworkImage(widget.image),height: 80,)),
                     Padding(
                       padding: const EdgeInsets.all(15.0),
                       child: Column(

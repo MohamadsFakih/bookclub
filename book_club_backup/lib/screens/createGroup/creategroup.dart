@@ -7,6 +7,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../bookstest.dart';
+
 class OurCreateGroup extends StatefulWidget {
   const OurCreateGroup({Key? key}) : super(key: key);
 
@@ -18,8 +20,8 @@ class _OurCreateGroupState extends State<OurCreateGroup> {
 
   void goToAddBook(BuildContext context,String groupName)async{
 
-      Navigator.push(context, MaterialPageRoute(builder: (context)=> OurAddBook(groupName: groupName, onGroupCreation: true,
-      name: "",bookLink: "",length: "",author: "",image: "",)));
+    Navigator.push(context, MaterialPageRoute(builder: (context)=>BookTest(gid: groupName,onGroupCreation: true,)));
+
 
 
   }

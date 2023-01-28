@@ -43,10 +43,19 @@ dependencies:
   intl:
   books_finder:
   webview_flutter: ^2.0.12
+  flutter_rating_bar: ^4.0.1
+
+
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.9.0
+
+flutter_icons:
+  image_path: "assets/book_clublogo2.png"
+  android: true
+  ios: true
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -54,6 +63,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
+
+
 
 
 # For information on the generic Dart part of this file, see the
