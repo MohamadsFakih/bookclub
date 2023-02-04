@@ -64,7 +64,7 @@ class _OurAddBookState extends State<OurAddBook> {
       print("fetit");
       returnString= await OurDatabase().createGroup(groupName, us.uid, book,us.fullname);
     }else{
-      returnString=await OurDatabase().addBook(us.groupId, book);
+      returnString=await OurDatabase().addBook(us.groupId, book,false);
     }
     if(returnString=="success"){
       Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>OurRoot(),), (route) => false);

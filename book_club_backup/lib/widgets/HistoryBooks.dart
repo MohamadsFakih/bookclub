@@ -20,6 +20,7 @@ class HistoryBooks extends StatefulWidget {
   final String image;
   final String gid;
   final String bid;
+  final bool isowner;
 
   const HistoryBooks({Key? key,
     required this.name,
@@ -28,7 +29,8 @@ class HistoryBooks extends StatefulWidget {
     required this.categories,
     required this.image,
     required this.gid,
-    required this.bid
+    required this.bid,
+    required this.isowner
   }) : super(key: key);
 
   @override
@@ -72,7 +74,42 @@ class HistoryBooksState extends State<HistoryBooks> {
                                 child: Icon(Icons.remove_circle,color: Colors.red,),
                                 onTap: (){
                                   setState((){
-                                    FirebaseFirestore.instance.collection("groups").doc(widget.gid).collection("Fbooks").doc(widget.bid).delete();
+                                    if(widget.isowner){
+                                      showDialog(
+                                          context: context,
+                                          builder: (BuildContext ctx) {
+                                            return AlertDialog(
+                                              title: const Text('Please Confirm'),
+                                              content: Text('Are you sure to remove'+" "+widget.name+"?"),
+                                              actions: [
+                                                // The "Yes" button
+                                                TextButton(
+                                                    onPressed: () {
+                                                      // Remove the box
+                                                      setState(() {
+                                                        FirebaseFirestore.instance.collection("groups").doc(widget.gid).collection("Fbooks").doc(widget.bid).delete();
+
+                                                      });
+
+                                                      // Close the dialog
+                                                      Navigator.of(context).pop();
+                                                    },
+                                                    child: const Text('Yes')),
+                                                TextButton(
+                                                    onPressed: () {
+                                                      // Close the dialog
+                                                      Navigator.of(context).pop();
+                                                    },
+                                                    child: const Text('No'))
+                                              ],
+                                            );
+                                          });
+                                    }else{
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text("Only the group admin can remove books"),
+                                            duration: Duration(seconds: 2),)
+                                      );
+                                    }
 
                                   });
                                 },

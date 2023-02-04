@@ -46,13 +46,40 @@ class HomeBooksState extends State<HomeBooks> {
       padding: const EdgeInsets.all(10.0),
       child: GestureDetector(
         onTap: ()async{
-
           if(widget.isowner){
-            await OurDatabase().changeBook(widget.gid, widget.bid);
-            ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Changed book, press Refresh"),
-                  duration: Duration(seconds: 2),)
-            );
+
+            showDialog(
+                context: context,
+                builder: (BuildContext ctx) {
+                  return AlertDialog(
+                    title: const Text('Please Confirm'),
+                    content: Text('Are you sure you want to change the current book?'),
+                    actions: [
+                      // The "Yes" button
+                      TextButton(
+                          onPressed: ()async {
+                            // Remove the box
+                            await OurDatabase().changeBook(widget.gid, widget.bid);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("Changed book, press Refresh"),
+                                  duration: Duration(seconds: 2),)
+                            );
+
+                            // Close the dialog
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Yes')),
+                      TextButton(
+                          onPressed: () {
+                            // Close the dialog
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('No'))
+                    ],
+                  );
+                });
+
+
           }else{
             ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text("Only the group admin can change the current boook"),
@@ -85,10 +112,44 @@ class HomeBooksState extends State<HomeBooks> {
                               GestureDetector(
                                 child: Icon(Icons.remove_circle,color: Colors.red,),
                                 onTap: (){
-                                  setState((){
-                                    FirebaseFirestore.instance.collection("groups").doc(widget.gid).collection("books").doc(widget.bid).delete();
+                                     if(widget.isowner){
+                                       showDialog(
+                                           context: context,
+                                           builder: (BuildContext ctx) {
+                                             return AlertDialog(
+                                               title: const Text('Please Confirm'),
+                                               content: Text('Are you sure to remove'+" "+widget.name+"?"),
+                                               actions: [
+                                                 // The "Yes" button
+                                                 TextButton(
+                                                     onPressed: () {
+                                                       // Remove the box
+                                                       setState(() {
+                                                         FirebaseFirestore.instance.collection("groups").doc(widget.gid).collection("books").doc(widget.bid).delete();
 
-                                  });
+                                                       });
+
+                                                       // Close the dialog
+                                                       Navigator.of(context).pop();
+                                                     },
+                                                     child: const Text('Yes')),
+                                                 TextButton(
+                                                     onPressed: () {
+                                                       // Close the dialog
+                                                       Navigator.of(context).pop();
+                                                     },
+                                                     child: const Text('No'))
+                                               ],
+                                             );
+                                           });
+                                     }else{
+                                       ScaffoldMessenger.of(context).showSnackBar(
+                                           SnackBar(content: Text("Only the group admin can remove books"),
+                                             duration: Duration(seconds: 2),)
+                                       );
+                                     }
+
+
                                 },
                               )
                             ],

@@ -24,6 +24,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/user.dart';
 import '../../widgets/SearchItem.dart';
@@ -83,8 +84,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void leaveGroup(BuildContext context,String gid,String uid,String name)async{
-    CurrenState currenState=Provider.of(context,listen: false);
-    String returnString=await OurDatabase().leaveGroup(gid,uid, currenState.getCurrentUser.fullname);
+    String returnString=await OurDatabase().leaveGroup(gid,uid, name);
+    if(returnString=="success") {
+      Navigator.pushAndRemoveUntil(
+          context, MaterialPageRoute(builder: (context) => OurRoot(),), (
+          route) => false);
+    }
+  }
+  void deleteGroup(BuildContext context,String gid,List<String> members)async{
+    String returnString=await OurDatabase().deleteGroup(gid, members);
     if(returnString=="success") {
       Navigator.pushAndRemoveUntil(
           context, MaterialPageRoute(builder: (context) => OurRoot(),), (
@@ -103,6 +111,105 @@ class _HomeScreenState extends State<HomeScreen> {
     List<String> names= currentG.memebrsNames;
     List<String> namesId= currentG.memebrs;
 
+    void handleClick(String value) {
+      switch (value) {
+        case 'Logout':
+          signOut(context);
+          break;
+        case 'Settings':
+          break;
+
+        case 'History':
+          Navigator.push(context,MaterialPageRoute(builder: (context)=>OurHistory(gid: currentG.id,isowner: currentG.leader==currentUser.uid,)));
+          break;
+      }
+    }
+
+
+    void _showContextMenu(BuildContext context,String userId,String userName) async {
+      Rect? rect;
+      RenderBox? overlay = Overlay.of(context)?.context.findRenderObject() as RenderBox;
+      final renderObject = context.findRenderObject();
+      final translation = renderObject?.getTransformTo(null).getTranslation();
+      if (translation != null && renderObject?.paintBounds != null) {
+        final offset = Offset(translation.x, translation.y);
+        rect = renderObject!.paintBounds.shift(offset);
+      }
+
+      final result = await showMenu(
+          context: context,
+
+          // Show the context menu at the tap location
+          position: RelativeRect.fromRect(
+              rect!,
+              Offset.zero & overlay.size,),
+
+          // set a list of choices for the context menu
+          items: [
+             PopupMenuItem(
+              value: 'Add Friend',
+              child: Text('Add Friend'),
+            ),
+            PopupMenuItem(
+              value: 'View Profile',
+              child: Text('View Profile'),
+            ),
+            currentG.leader==currentUser.uid?
+             PopupMenuItem(
+              value: 'Kick',
+              child: Text('Kick'),
+            ):
+            PopupMenuItem(
+
+              child: Text(''),
+            ),
+
+          ]);
+
+      // Implement the logic for each choice here
+      switch (result) {
+        case 'Add Friend':
+          debugPrint('Add To Favorites');
+          break;
+        case 'Kick':
+            showDialog(
+                context: context,
+                builder: (BuildContext ctx) {
+                  return AlertDialog(
+                    title: const Text('Please Confirm'),
+                    content: Text('Are you sure you want to kick '+userName+" for your club?"),
+                    actions: [
+                      // The "Yes" button
+                      TextButton(
+                          onPressed: ()async {
+                            // Remove the box
+                            await OurDatabase().leaveGroup(currentG.id, userId, userName);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("User has been removed"),
+                                  duration: Duration(seconds: 2),)
+                            );
+
+                            // Close the dialog
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Yes')),
+                      TextButton(
+                          onPressed: () {
+                            // Close the dialog
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('No'))
+                    ],
+                  );
+                });
+
+          break;
+        case 'View Profile':
+          debugPrint('Hide');
+          break;
+      }
+    }
+
     return (currentG.id!="" && book.id!="" && names!=[])? Scaffold(
         appBar: AppBar(
           title: Text("Home"),
@@ -110,11 +217,13 @@ class _HomeScreenState extends State<HomeScreen> {
           elevation: 0.0,
           backgroundColor: Color(0xfff73366ff),
           actions: <Widget>[
+
             GestureDetector(
                 onTap: (){
                   goToAddBook(context,currentG.id);
                 },
                 child: Icon(Icons.add)),
+
             PopupMenuButton<String>(
               onSelected: handleClick,
               itemBuilder: (BuildContext context) {
@@ -133,7 +242,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
       drawer: Drawer(
         child: Container(
-          color: Colors.grey,
+
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
           child: Column(
             children: [
               DrawerHeader(
@@ -181,10 +291,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
                       return Column(
                         children: [
-                        ListTile(
-                          title: Text(names[index]),
-                          leading: Icon(namesId[index]==currentG.leader? Icons.star:Icons.person),
-                          ),
+                        GestureDetector(
+                     
+                          onLongPress: (){
+                            if( namesId[index]!=currentUser.uid){
+                              _showContextMenu(context,namesId[index],names[index]);
+                            }
+                      },
+
+                          child: ListTile(
+                            title: Text(names[index]),
+                            leading: Icon(namesId[index]==currentG.leader? Icons.star:Icons.person),
+                            ),
+                        ),
                           Divider(color: Colors.black,)
 
                       ],
@@ -200,7 +319,37 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: Colors.black,
 
                     onPressed: (){
-                      leaveGroup(context, currentG.id,currentUser.uid,currentUser.fullname);
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext ctx) {
+                            return AlertDialog(
+                              title: const Text('Please Confirm'),
+                              content: Text(currentUser.uid==currentG.leader?"Are you sure you want to delete the group?":"Are you sure you want to leave the group?"),
+                              actions: [
+                                // The "Yes" button
+                                TextButton(
+                                    onPressed: ()async {
+                                      // Remove the box
+                                      currentUser.uid==currentG.leader?deleteGroup(context, currentG.id, currentG.memebrs):leaveGroup(context, currentG.id,currentUser.uid,currentUser.fullname)
+                                      ;
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text(currentUser.uid==currentG.leader?"BookClub deleted":"Success"),
+                                            duration: Duration(seconds: 2),)
+                                      );
+
+                                      // Close the dialog
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text('Yes')),
+                                TextButton(
+                                    onPressed: () {
+                                      // Close the dialog
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text('No'))
+                              ],
+                            );
+                          });
 
                     }
                 ),
@@ -279,8 +428,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     children: [
                                       RaisedButton(
                                         onPressed: (){
-                                          Navigator.push(context,MaterialPageRoute(builder: (context)=>Readbook(link: currentG.bookLink,)));
-
+                                          doprivacy(currentG.bookLink);
                                         },
                                         child: Text("Read",style: TextStyle(color: Colors.white),),
                                       ),
@@ -347,17 +495,17 @@ class _HomeScreenState extends State<HomeScreen> {
         )
     ):OurSplashScreen();
   }
-  void handleClick(String value) {
-    CurrentGroup currentGroup=Provider.of<CurrentGroup>(context,listen: false);
-    switch (value) {
-      case 'Logout':
-        signOut(context);
-        break;
-      case 'Settings':
-        break;
-      case 'History':
-        Navigator.push(context,MaterialPageRoute(builder: (context)=>OurHistory(gid: currentGroup.getCurrentGroup.id,)));
-        break;
+
+
+  Future<void> doprivacy(String link) async {
+    String url=link;
+    if(await canLaunch(url)){
+      await launch(url);
+    }else{
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Couldn't launch link"),
+            duration: Duration(seconds: 2),)
+      );
     }
   }
 }

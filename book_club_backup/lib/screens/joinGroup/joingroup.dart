@@ -22,6 +22,11 @@ class _OurJoinGroupState extends State<OurJoinGroup> {
     String returnString = await OurDatabase().joinGroup(groupId, currenState.getCurrentUser.uid,currenState.getCurrentUser.fullname);
     if(returnString=="success"){
       Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>OurRoot(),), (route) => false);
+    }else{
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Invalid Group Link"),
+            duration: Duration(seconds: 2),)
+      );
     }
 
   }

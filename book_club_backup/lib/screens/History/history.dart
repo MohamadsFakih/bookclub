@@ -8,7 +8,8 @@ import '../../widgets/HomeBooks.dart';
 
 class OurHistory extends StatefulWidget {
   final String gid;
-  const OurHistory({Key? key,required this.gid}) : super(key: key);
+  final bool isowner;
+  const OurHistory({Key? key,required this.gid,required this.isowner}) : super(key: key);
 
   @override
   State<OurHistory> createState() => _OurHistoryState();
@@ -50,7 +51,7 @@ class _OurHistoryState extends State<OurHistory> {
 
                         if(document!=null){
                           return HistoryBooks(name: document["name"], author: document["author"],pages: document["length"],
-                            categories: [""],image: document["image"],gid: widget.gid,bid: document.id,);
+                            categories: [""],image: document["image"],gid: widget.gid,bid: document.id,isowner: widget.isowner,);
                         }
 
                         return const Center(child: LinearProgressIndicator());

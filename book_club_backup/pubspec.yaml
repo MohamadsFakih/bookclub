@@ -44,6 +44,7 @@ dependencies:
   books_finder:
   webview_flutter: ^2.0.12
   flutter_rating_bar: ^4.0.1
+  url_launcher:
 
 
 

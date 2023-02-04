@@ -46,7 +46,7 @@ class OurDatabase{
     }
     return Future.delayed(Duration(seconds: 2), () => retVal);
   }
-  Future<String> addBook(String groupId,OurBook book)async {
+  Future<String> addBook(String groupId,OurBook book,bool onCreate)async {
     String retval = "error";
     try {
       DocumentReference docRef = await firestore.collection("groups").doc(groupId).collection("books").add({
@@ -56,12 +56,15 @@ class OurDatabase{
         'dateCompleted': book.dateCompleted,
         'image':book.image,
       });
-      //add book to group scehdule
-      await firestore.collection("groups").doc(groupId).update({
-        'currentBook': docRef.id,
-        "currentbookDue":book.dateCompleted,
-        "bookLink":book.bookLink
-      });
+      if(onCreate){
+        await firestore.collection("groups").doc(groupId).update({
+          'currentBook': docRef.id,
+          "currentbookDue":book.dateCompleted,
+          "bookLink":book.bookLink
+        });
+      }
+
+
       retval = "success";
     } catch (e) {
       print(e);
@@ -99,14 +102,16 @@ class OurDatabase{
         'leader':userId,
         'members': members,
         'groupCreated': Timestamp.now(),
-        'memberNames':membersNames
+        'memberNames':membersNames,
+
       });
       await firestore.collection("users").doc(userId).update({
         'groupId':docRef.id
       });
 
+
       //add a book
-      addBook(docRef.id,initialBook);
+      addBook(docRef.id,initialBook,true);
 
       retval="success";
 
@@ -205,10 +210,6 @@ class OurDatabase{
         'from':uname
       });
 
-
-
-
-
       retval="success";
     }catch(e){
       print(e);
@@ -255,9 +256,24 @@ class OurDatabase{
     }
     return retval;
   }
+  Future<String> deleteGroup(String Gid,List<String> members)async{
+    String retval="error";
+    try{
 
+      await firestore.collection("groups").doc(Gid).delete();
+      for(int i=0;i<members.length;i++){
+        await firestore.collection("users").doc(members[i]).update({
+          'groupId':""
+        });
+      }
 
+      retval="success";
 
+    }catch(e){
+      print(e);
+    }
+    return retval;
+  }
 
 
 }
