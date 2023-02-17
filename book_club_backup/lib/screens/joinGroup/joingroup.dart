@@ -28,7 +28,6 @@ class _OurJoinGroupState extends State<OurJoinGroup> {
             duration: Duration(seconds: 2),)
       );
     }
-
   }
 
   TextEditingController groupIdController=TextEditingController();

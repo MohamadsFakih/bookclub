@@ -19,11 +19,7 @@ class OurCreateGroup extends StatefulWidget {
 class _OurCreateGroupState extends State<OurCreateGroup> {
 
   void goToAddBook(BuildContext context,String groupName)async{
-
     Navigator.push(context, MaterialPageRoute(builder: (context)=>BookTest(gid: groupName,onGroupCreation: true,)));
-
-
-
   }
 
   TextEditingController groupNameController=TextEditingController();

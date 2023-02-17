@@ -6,9 +6,6 @@ class OurUser{
   String fullname;
   Timestamp accountCreated;
   String groupId;
-
-
-
   OurUser({
     required this.uid,
     required this.email,

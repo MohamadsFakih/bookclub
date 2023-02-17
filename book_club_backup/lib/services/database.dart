@@ -10,7 +10,7 @@ import '../models/user.dart';
 
 class OurDatabase{
   final FirebaseFirestore firestore=FirebaseFirestore.instance;
-
+  //function to create a user in the databse
   Future<String> createUser(OurUser user)async{
     String retval="error";
 
@@ -29,7 +29,7 @@ class OurDatabase{
     return retval;
   }
 
-
+  //function to get the user info
   Future<OurUser> getUserInfo(String uid)async{
     OurUser retVal=OurUser(uid: "", email: "", fullname: "", accountCreated: Timestamp.now(),groupId: "");
 
@@ -46,6 +46,7 @@ class OurDatabase{
     }
     return Future.delayed(Duration(seconds: 2), () => retVal);
   }
+  //function to add a book to the database
   Future<String> addBook(String groupId,OurBook book,bool onCreate)async {
     String retval = "error";
     try {
@@ -72,8 +73,7 @@ class OurDatabase{
     return retval;
   }
   
-
-
+  //function to change the current book beign read
   Future<String> changeBook(String groupId,String bookId)async {
     String retval = "error";
     try {
@@ -88,7 +88,7 @@ class OurDatabase{
     }
     return retval;
   }
-
+  //function to create a group
   Future<String> createGroup(String groupName,String userId,OurBook initialBook,String userName)async{
     String retval="error";
     List<String> members=[];
@@ -120,6 +120,7 @@ class OurDatabase{
     }
     return retval;
   }
+  //function to join a group through an ID
   Future<String> joinGroup(String groupID,String userId,String userName)async{
     String retval="error";
     List<String> members=[];
@@ -144,8 +145,7 @@ class OurDatabase{
     return retval;
   }
 
-
-
+  //function to get the group info
   Future<OurGroup> getGroupInfo(String groupId)async{
     OurGroup retVal=OurGroup(name: "", id: "", leader: "", memebrs: [], groupCreated: Timestamp.now(), currentBookDue: Timestamp.now(), currentBookId: "",
     memebrsNames: [],bookLink: "");
@@ -168,7 +168,7 @@ class OurDatabase{
     return Future.delayed(Duration(seconds: 2), () => retVal);
   }
 
-
+  //function to get the current book being read
   Future<OurBook> getCurrentBook(String groupId,String bookId)async{
     OurBook retVal=OurBook(id: "", name: "", length: "", dateCompleted: Timestamp.now(),author: "",image: "",bookLink: "");
 
@@ -189,7 +189,7 @@ class OurDatabase{
     return Future.delayed(Duration(seconds: 2), () => retVal);
   }
 
-
+  //function to allow the user to add a rating to the book
   Future<String> finishedBook(String groupId,OurBook book,String uid,double rating,String review,String uname) async{
     String retval="error";
     try{
@@ -218,6 +218,7 @@ class OurDatabase{
     return retval;
 
   }
+  //function that checks is a user is done reading a book
   Future<bool> isUserDoneWithBook(String groupId,String bookId,String uid)async{
     bool retval=false;
     try{
@@ -234,7 +235,7 @@ class OurDatabase{
     return retval;
   }
 
-
+  //function to leave a group
   Future<String> leaveGroup(String groupID,String userId,String userName)async{
     String retval="error";
 
@@ -256,6 +257,7 @@ class OurDatabase{
     }
     return retval;
   }
+  //function to delete a group
   Future<String> deleteGroup(String Gid,List<String> members)async{
     String retval="error";
     try{

@@ -61,7 +61,6 @@ class _OurAddBookState extends State<OurAddBook> {
     OurUser us =currenState.getCurrentUser;
     String returnString;
     if(widget.onGroupCreation){
-      print("fetit");
       returnString= await OurDatabase().createGroup(groupName, us.uid, book,us.fullname);
     }else{
       returnString=await OurDatabase().addBook(us.groupId, book,false);
